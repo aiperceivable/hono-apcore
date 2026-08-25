@@ -9,6 +9,10 @@ repos:
         language: system
         types_or: [text, ts, javascript]
         exclude: '^node_modules/'
+        # One invocation for every file. pre-commit otherwise splits them into
+        # parallel batches, and concurrent `npx` processes race to populate the
+        # same cache entry when apdev-js is not already in node_modules.
+        require_serial: true
 
       - id: check-imports
         name: apdev-js check-imports
