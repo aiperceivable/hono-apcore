@@ -1,0 +1,25 @@
+{
+  "name": "hono-apcore-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "tsx src/main.ts",
+    "scan": "tsx ../../src/cli.ts scan ./src/app.ts:app",
+    "export": "tsx ../../src/cli.ts export ./src/app.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.1",
+    "@sinclair/typebox": "^0.34.52",
+    "apcore-js": "^0.27.0",
+    "apcore-mcp": "^0.18.1",
+    "hono": "^4.13.4",
+    "hono-apcore": "file:../.."
+  },
+  "devDependencies": {
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

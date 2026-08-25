@@ -1,0 +1,34 @@
+# Access-control rules for the hono-apcore demo.
+#
+# The Executor enforces these on every module call, whether it arrives over MCP
+# or from one of the app's own Hono routes.
+#
+# How the caller is identified:
+#   - Over MCP with no credentials, the call reaches the Executor with no
+#     identity at all, and the ACL evaluates it as the caller "@external".
+#   - With JWT_SECRET set, JWTAuthenticator turns the token's `sub` claim into
+#     identity.id and its `type` claim into identity.type ("user" below).
+#   - From a Hono route, HonoContextFactory derives the identity from the
+#     request headers (x-user-id / Authorization / x-roles).
+default_effect: deny
+
+rules:
+  - description: "Reads are public — no credentials required"
+    callers: ["*"]
+    targets:
+      - "todo.list"
+      - "todo.get"
+      - "weather.*"
+      - "system.health.*"
+      - "system.manifest.*"
+      - "system.usage.*"
+    effect: allow
+
+  - description: "Only an authenticated user may mutate todos or toggle features"
+    callers: ["*"]
+    targets:
+      - "todo.*"
+      - "system.control.*"
+    effect: allow
+    conditions:
+      identity_types: ["user"]

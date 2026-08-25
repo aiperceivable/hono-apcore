@@ -1,0 +1,12 @@
+# apcore configuration for the ACL demo.
+#
+# The demo loads acl.yaml explicitly by path (see app.ts), so this file matters
+# only if you prefer CWD-based discovery via ACL.discover(config): run from
+# this directory and the acl.root below is picked up automatically.
+version: "1.0.0"
+
+project:
+  name: hono-apcore-acl-demo
+
+acl:
+  root: ./acl.yaml

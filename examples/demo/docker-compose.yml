@@ -1,0 +1,11 @@
+services:
+  demo:
+    build:
+      context: ../../
+      dockerfile: examples/demo/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      # Uncomment to require a Bearer token on /mcp:
+      # JWT_SECRET: my-secret
+      APCORE_DEBUG: "false"

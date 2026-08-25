@@ -1,0 +1,22 @@
+# apcore configuration — auto-discovered by apcore-js from the working directory.
+# See https://github.com/aiperceivable/apcore-typescript for all options.
+
+version: "1.0.0"
+
+project:
+  name: hono-apcore-demo
+
+acl:
+  root: ./acl.yaml       # ACL.discover() loads this file automatically.
+                         # Point it at a directory to use the <dir>/global_acl.yaml
+                         # convention. Remove this key (or delete acl.yaml) to
+                         # disable ACL enforcement.
+
+sys_modules:
+  enabled: true          # Registers system tools: health, usage, toggle_feature, reload, manifest
+  events:
+    enabled: true        # Emits module.toggled events for the audit trail
+
+apcore-mcp:
+  log_level: INFO
+  validate_inputs: true  # Enforce input schemas on every MCP call
