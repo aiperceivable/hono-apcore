@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       apcore-js:
-        specifier: '>=0.27.0'
-        version: 0.27.0
+        specifier: '>=0.32.2'
+        version: 0.32.2
       apcore-toolkit:
-        specifier: '>=0.10.1'
-        version: 0.10.1(@sinclair/typebox@0.34.52)
+        specifier: '>=0.14.0'
+        version: 0.14.0(@sinclair/typebox@0.34.52)
       js-yaml:
         specifier: ^4.1.0
         version: 4.3.1
@@ -37,14 +37,14 @@ importers:
         specifier: ^3.2.0
         version: 3.2.7(vitest@3.2.7(@types/node@20.19.43)(tsx@4.23.12))
       apcore-a2a:
-        specifier: ^0.5.0
-        version: 0.5.0(@sinclair/typebox@0.34.52)
+        specifier: ^0.8.3
+        version: 0.8.3(@sinclair/typebox@0.34.52)
       apcore-cli:
-        specifier: ^0.10.5
-        version: 0.10.5(apcore-js@0.27.0)(apcore-toolkit@0.10.1(@sinclair/typebox@0.34.52))
+        specifier: ^0.12.5
+        version: 0.12.5(apcore-js@0.32.2)(apcore-toolkit@0.14.0(@sinclair/typebox@0.34.52))
       apcore-mcp:
-        specifier: ^0.18.1
-        version: 0.18.1(@sinclair/typebox@0.34.52)(zod@4.4.3)
+        specifier: ^0.23.1
+        version: 0.23.1(@sinclair/typebox@0.34.52)(zod@4.4.3)
       apdev-js:
         specifier: ^0.2.0
         version: 0.2.4(typescript@5.9.3)
@@ -304,7 +304,6 @@ packages:
     engines: {node: ^22.20 || ^24.12 || >=25}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -344,79 +343,66 @@ packages:
     resolution: {integrity: sha512-r9fGh3eFs3e/udWh5ZjXQtxiYK/xoFxQaYR/cELxac/Udkl5Th+IsFm0CX3Kl9hmUH/we7EoMpjJgeQNnE0+IA==}
     cpu: [arm]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-arm-musleabihf@4.62.5':
     resolution: {integrity: sha512-xdvFdp7OM6KLJviJT2g/YuRSUjnZgGHk4RNgwIbN7X6cPugOucV60DdHXWzsBVCUdrGb6qSXnJQrrAKMmQuj3Q==}
     cpu: [arm]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-linux-arm64-gnu@4.62.5':
     resolution: {integrity: sha512-rRqILAndyzHzP7T9NFQrq+4HFWNhqkqkKur7eiBpfLmz01PO0JKx5Vchu3YllE4YXI/Ftgq/szrDWg5GJ0mI8g==}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-arm64-musl@4.62.5':
     resolution: {integrity: sha512-Gf4X3qVMucayUvux6aXXPgXovocSFUC0rrffDuPI/S2nHhNMhjcZxsrAFYCOF350PRreW1XwzFj3CT/3bKsWCw==}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-linux-loong64-gnu@4.62.5':
     resolution: {integrity: sha512-+s5qA0TNM0qm8PK/a5gt/1Hpx+NV08uSuCncvhziIlQzT6AEV2fnUQo7eBtFTFO0nA9scauvoR2HusfXmQnO4w==}
     cpu: [loong64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-loong64-musl@4.62.5':
     resolution: {integrity: sha512-ybb6QvWwWJCbBWqERpc8K3pYVGIrXlG8MEQ8IIuJY6Y9KdHQxoFoNyfkAOtKn1VHu3KuLidXvwrvGR1mEjeWCw==}
     cpu: [loong64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-linux-ppc64-gnu@4.62.5':
     resolution: {integrity: sha512-nZb1DtnOyhCmYvsC8A2CwOkopVg+IS1+fPUa7rMOAXtNw5+lLCLLPqd6XAiNrGtoQKsbvIBOwsHnBH/3wnb4HQ==}
     cpu: [ppc64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-ppc64-musl@4.62.5':
     resolution: {integrity: sha512-yMbj63Sp89ryrXLWyz+sy+fYD2HpOnMCLGbe4Oa1smclFSUukdtD/BgdiHaAetJNb74URD8U4hM+qG5KVzMEkg==}
     cpu: [ppc64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-linux-riscv64-gnu@4.62.5':
     resolution: {integrity: sha512-mhoan3OJw2kYV/e1jtIdmvUZgyBFeA6zGWsOswmR0Tg19TQbowZuR+JMLID6spbbBN7Zee2ejrgmy3+FxGrIdA==}
     cpu: [riscv64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-riscv64-musl@4.62.5':
     resolution: {integrity: sha512-5ZTLmjWbb1VZdjuyhe83K/8QO0/h11midQCBP+X5OYn32ra7eOBoM0ZqtaY4nkgNsYgmdVhMYPoyVPTjUpHf3w==}
     cpu: [riscv64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-linux-s390x-gnu@4.62.5':
     resolution: {integrity: sha512-m53kG+br6PGxOTmgBEM2DHSDs9RVjsyEbUwjJPJGTFm1grWOG8EKJggDCTb60unD4Tjby8fi7/m9XfkEWasVWg==}
     cpu: [s390x]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-x64-gnu@4.62.5':
     resolution: {integrity: sha512-6RHPJR1g/uvdYU8uXBnfq3nlqyZCP82Fr6NHgfGoaIeSh0YEqnX/x6uA9MmJJbnSH7swqX4F+CkGdUF+6doiQA==}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-x64-musl@4.62.5':
     resolution: {integrity: sha512-xs+OXQtEXgpXT0DmA5+U3qnRZHdCST/5HRQxS8wSPZTUZN/EMWeHuSIod32LQklTBZBV9DyfncKBQ8n5V3eFdw==}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-openbsd-x64@4.62.5':
     resolution: {integrity: sha512-e7hD+sl3s+mcLQDZ8pbudBVsdG6r5yN4w3LqG2TJ8sQHDpblWj5lrJs/3m01Cvlxbt4x13zu5thLjgypgtkYzw==}
@@ -535,30 +521,30 @@ packages:
     resolution: {integrity: sha512-4Dj6M28JB+oAH8kFkTLUo+a2jwOFkuqb3yucU0CANcRRUbxS0cP0nZYCGjcc3BNXwRIsUVmDGgzawme7zvJHvg==}
     engines: {node: '>=12'}
 
-  apcore-a2a@0.5.0:
-    resolution: {integrity: sha512-8IP9xhUzdvp6dkP6leO7a839WSvIGXhmCdkD8fjGfXDyEc3puAhktik1Nh1YnDIIeNrPLn6yH93puN1SxfYPuA==}
-    engines: {node: '>=18.0.0'}
+  apcore-a2a@0.8.3:
+    resolution: {integrity: sha512-Q4Cbzc+MtzlPqLQ4KQyCjfGBd8SOwZ9SgWSY+GqFneiKTvx1T3aqVk+b+a11OW7N1gn8a3/hYP0KA1xucrlhkg==}
+    engines: {node: '>=20.0.0'}
     hasBin: true
 
-  apcore-cli@0.10.5:
-    resolution: {integrity: sha512-7hiUyI+IOdfk4aQ/ad6/DVv7pKrZbJEvR8rCOYY+xs08jzgPWM9J1fKrKc2PrLdRZ8ZeqDOrACfNnpOk9kaBwQ==}
+  apcore-cli@0.12.5:
+    resolution: {integrity: sha512-SOmKADxViJ2b3YehAZI0Fox+kHYNqjStEMHlWerV4VCA3mIOjeDdrLd5enjmwdxVvY+QEaL3lsDWxQhjBMX5Ow==}
     engines: {node: '>=20.0.0'}
     hasBin: true
     peerDependencies:
-      apcore-js: '>=0.27.0'
-      apcore-toolkit: '>=0.10.0'
+      apcore-js: '>=0.32.2'
+      apcore-toolkit: '>=0.14.0'
 
-  apcore-js@0.27.0:
-    resolution: {integrity: sha512-Q3O3Ef2+2to7Z9wjsMjoDQ37FSityUX8EiWUVITqDxLp4qDFTMDq+9n9NuydHhWhHoyXZ5mG9Xt4yZPIwcTQIQ==}
+  apcore-js@0.32.2:
+    resolution: {integrity: sha512-+hANsBxTS1IIWAgVxCS7NV6d4s+aQlJNljSLJul70ItrMdmILpeebNlY9sjgGZV3HE2H0J89dUkkezggwtTSmg==}
     engines: {node: '>=20.0.0'}
 
-  apcore-mcp@0.18.1:
-    resolution: {integrity: sha512-2rxPEXj76x/+m6ib3XzBCkApKT8uAmcTBonk4M1/92a5P7i7QNPgah7uyu1DmIeUTk/+EOpSqDR7PhRMK9CFwA==}
-    engines: {node: '>=18.0.0'}
+  apcore-mcp@0.23.1:
+    resolution: {integrity: sha512-X2WIR5iMxY1Y5F6TmoV3uqIv635Kaf/J599vkIFrnvS/C2q64fJqnCB3ZLmAM9w7dQJ4n94G6Wna0fdrtZfhmQ==}
+    engines: {node: '>=20.0.0'}
     hasBin: true
 
-  apcore-toolkit@0.10.1:
-    resolution: {integrity: sha512-N+7A/7pzBe0FqOgrVM7SieiwFapzLA4tdL/U6Smvx5Mpeb2PzKqL9+dYm+tmJDvE6Y8YVYSdjX/oZKrnRddFCw==}
+  apcore-toolkit@0.14.0:
+    resolution: {integrity: sha512-S1vBRUx379NXMVn1Kg2qXpd0VXDmNRTyno43y8mx4sC8f2ge7yprBxWooczLkkHE5y7s7Sd8ReCfaNhW4jmtiw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@sinclair/typebox': '>=0.31.0'
@@ -1790,11 +1776,11 @@ snapshots:
 
   ansi-styles@6.2.3: {}
 
-  apcore-a2a@0.5.0(@sinclair/typebox@0.34.52):
+  apcore-a2a@0.8.3(@sinclair/typebox@0.34.52):
     dependencies:
       '@a2a-js/sdk': 1.0.1(express@5.2.1)
-      apcore-js: 0.27.0
-      apcore-toolkit: 0.10.1(@sinclair/typebox@0.34.52)
+      apcore-js: 0.32.2
+      apcore-toolkit: 0.14.0(@sinclair/typebox@0.34.52)
       express: 5.2.1
       jsonwebtoken: 9.0.3
       uuid: 13.0.2
@@ -1804,27 +1790,28 @@ snapshots:
       - '@sinclair/typebox'
       - supports-color
 
-  apcore-cli@0.10.5(apcore-js@0.27.0)(apcore-toolkit@0.10.1(@sinclair/typebox@0.34.52)):
+  apcore-cli@0.12.5(apcore-js@0.32.2)(apcore-toolkit@0.14.0(@sinclair/typebox@0.34.52)):
     dependencies:
       '@sinclair/typebox': 0.34.52
-      apcore-js: 0.27.0
-      apcore-toolkit: 0.10.1(@sinclair/typebox@0.34.52)
+      apcore-js: 0.32.2
+      apcore-toolkit: 0.14.0(@sinclair/typebox@0.34.52)
       commander: 12.1.0
       js-yaml: 4.3.1
     optionalDependencies:
       keytar: 7.9.0
 
-  apcore-js@0.27.0:
+  apcore-js@0.32.2:
     dependencies:
       '@sinclair/typebox': 0.34.52
       js-yaml: 4.3.1
       uuid: 11.1.1
 
-  apcore-mcp@0.18.1(@sinclair/typebox@0.34.52)(zod@4.4.3):
+  apcore-mcp@0.23.1(@sinclair/typebox@0.34.52)(zod@4.4.3):
     dependencies:
       '@modelcontextprotocol/sdk': 1.30.0(zod@4.4.3)
-      apcore-js: 0.27.0
-      apcore-toolkit: 0.10.1(@sinclair/typebox@0.34.52)
+      ajv: 8.20.0
+      apcore-js: 0.32.2
+      apcore-toolkit: 0.14.0(@sinclair/typebox@0.34.52)
       jsonwebtoken: 9.0.3
       mcp-embedded-ui: 0.5.0
     transitivePeerDependencies:
@@ -1833,11 +1820,11 @@ snapshots:
       - supports-color
       - zod
 
-  apcore-toolkit@0.10.1(@sinclair/typebox@0.34.52):
+  apcore-toolkit@0.14.0(@sinclair/typebox@0.34.52):
     dependencies:
       '@sinclair/typebox': 0.34.52
       ajv: 8.20.0
-      apcore-js: 0.27.0
+      apcore-js: 0.32.2
       js-yaml: 4.3.1
 
   apdev-js@0.2.4(typescript@5.9.3):

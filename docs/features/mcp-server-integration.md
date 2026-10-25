@@ -121,7 +121,14 @@ Everything is forwarded to `apcore-mcp`.
 | `approvalHandler` / `approvalStore` / `approvalNotify` | | The approval gate |
 | `mcpMiddleware` / `mcpAcl` | | Extra apcore middleware / ACL for the MCP executor (forwarded as `middleware` / `acl`) |
 | `dynamic` | `boolean` | Announce tool-list changes as modules are registered |
+| `async` | boolean or options | Enable/configure the SDK Async Task Bridge (`enabled`, `maxConcurrent`, `maxTasks`) |
 | `onStartup` / `onShutdown` | callbacks | Standalone lifecycle hooks |
+
+MCP 0.23 uses runtime input schemas independently of OpenAI strict conversion,
+so optional fields and explicit nulls retain their declared meaning. Modern
+clients receive output schemas and structured content derived from redacted
+JSON output; Streamable HTTP requests must send the negotiated
+`mcp-protocol-version` header. See the [SDK upgrade notes](../sdk-upgrade.md).
 
 ## JWT authentication
 

@@ -34,7 +34,7 @@ surfaces are read-only consumers of what is registered.
 | --- | --- |
 | `core/apcore.ts` | `HonoApcore` — construction, `init()`, surface wiring |
 | `core/registry.ts` | `ApcoreRegistry` — registration and serialisation over the apcore `Registry` |
-| `core/executor.ts` | `ApcoreExecutor` — `call()`, `stream()`, `validate()` |
+| `core/executor.ts` | `ApcoreExecutor` — `call()`, `stream()`, `validate()`, `callWithTrace()`, step middleware |
 | `core/middleware.ts` | The `apcore()` Hono middleware and its accessors |
 | `tools/define-tool.ts` | `defineTool` / `defineToolset` and the conversion to `ScannedModule` |
 | `scanners/hono-route-scanner.ts` | Route table → modules that replay through `app.request()` |
@@ -102,3 +102,10 @@ registering twice — and `ready()` awaits an in-flight one. With
 - [MCP integration](./mcp-server-integration.md)
 - [Schema extraction](./schema-extraction.md)
 - [Context and ACL](./context-and-acl.md)
+
+## SDK compatibility
+
+The current integration targets apcore-js 0.32.2, toolkit 0.14.0, MCP 0.23.1,
+CLI 0.12.5 and A2A 0.8.3 on Node.js 20+. See the
+[upgrade assessment](../sdk-upgrade.md) for behavior changes, migration rules,
+and the division between upstream behavior and Hono adapter responsibilities.

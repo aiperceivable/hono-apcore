@@ -102,7 +102,7 @@ describe('ApBindingLoader', () => {
   it('accepts empty and binding-less documents', async () => {
     const loader = new ApBindingLoader(registry);
     await expect(loader.loadFromString('')).resolves.toEqual([]);
-    await expect(loader.loadFromString('other: 1\n')).resolves.toEqual([]);
+    await expect(loader.loadFromString('{}\n')).resolves.toEqual([]);
   });
 
   it('loads from a file', async () => {

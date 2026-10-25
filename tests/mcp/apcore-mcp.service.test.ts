@@ -41,6 +41,22 @@ beforeEach(() => {
 });
 
 describe('ApcoreMcpService', () => {
+  it('forwards async task controls and configured dynamic discovery to embedded MCP', async () => {
+    const { service } = await build({ async: { enabled: true, maxConcurrent: 2 }, dynamic: true });
+    await service.asyncServe();
+    expect(asyncServe.mock.calls[0][1]).toMatchObject({
+      async: { enabled: true, maxConcurrent: 2 }, dynamic: true,
+    });
+  });
+
+  it('renames per-start ACL and middleware overrides consistently', async () => {
+    const acl = { rules: [] };
+    const middleware = [{ priority: 2 }];
+    const { service } = await build({});
+    await service.start({ mcpAcl: acl, mcpMiddleware: middleware });
+    expect(serve.mock.calls[0][1]).toMatchObject({ acl, middleware });
+    expect(serve.mock.calls[0][1]).not.toHaveProperty('mcpAcl');
+  });
   it('starts out stopped with no embedded app', async () => {
     const { service } = await build();
     expect(service.isRunning).toBe(false);

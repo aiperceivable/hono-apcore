@@ -35,7 +35,10 @@ npm install @sinclair/typebox                      # TypeBox schemas (recommende
 npm install zod                                    # Zod schemas
 ```
 
-**Requirements:** Node.js >= 18, Hono >= 4 (tested with Hono 4.13).
+**Requirements:** Node.js >= 20, Hono >= 4 (tested with Hono 4.13).
+SDK minimums: apcore-js 0.32.2, apcore-toolkit 0.14.0; optional peers
+apcore-mcp 0.23.1, apcore-cli 0.12.5, and apcore-a2a 0.8.3.
+See [SDK upgrade notes](./docs/sdk-upgrade.md) for compatibility changes and new options.
 
 ## Quick start
 
@@ -132,7 +135,8 @@ const sendEmail = defineTool({
 | --- | --- |
 | `id` | Used verbatim. Otherwise `"<namespace>.<name>"`, with `name` snake-cased |
 | `inputSchema` / `outputSchema` | TypeBox, Zod, or plain JSON Schema |
-| `annotations` | `readonly`, `destructive`, `idempotent`, `requiresApproval`, `openWorld`, `streaming`, `cacheable`, … |
+| `annotations` | Partial SDK annotations, including `discoverable` and `extra` |
+| `metadata` / `display` / `version` | SDK metadata (including `async: true`), sparse surface display overlay, module version |
 | `params` | Per-parameter prose merged into the input schema. JavaScript cannot read a function's leading comments at run time the way Python reads a docstring, so this is explicit |
 | `handler` | `(inputs, context) => result`. A non-object result is wrapped as `{ result }` |
 
@@ -194,6 +198,8 @@ it.
 
 ```ts
 createApcore({
+  config?: Config,                // shared SDK configuration, including extension roots
+  executorOptions?: { strategy?, approvalHandler?, policy?, toggleState?, eventEmitter? },
   extensionsDir?: string | null,   // scanned by Registry.discover()
   acl?: ACL,                       // enforced by the Executor on every call
   middleware?: Middleware[],       // apcore middleware installed on the Executor
@@ -219,6 +225,11 @@ createApcore({
 | `mountMcp(app, opts?)` | Mount `/mcp`, the Explorer, and `/health` into the app |
 | `toOpenaiTools(opts?)` | OpenAI-compatible function definitions |
 | `close()` | Shut down the MCP and A2A surfaces |
+
+The executor also exposes `callWithTrace(id, inputs?, context?, { strategy? })`
+and `addStepMiddleware(middleware)`. Strategies can be SDK instances or registered
+names. `config` is passed to both SDK objects; an explicitly configured
+`extensions.root` or `extensions.roots` is discovered during `init()`.
 
 ### `apcore(instance | options, middlewareOptions?)`
 
@@ -310,6 +321,7 @@ whichever the host app installs (or neither) is fine. Register your own with
 Register modules without touching source:
 
 ```yaml
+spec_version: "1.0"
 bindings:
   - module_id: email.send
     target: EmailService.send
@@ -318,6 +330,10 @@ bindings:
       type: object
       properties:
         to: { type: string }
+    output_schema:
+      type: object
+      properties:
+        sent: { type: boolean }
     tags: [email, mutate]
     annotations:
       readonly: false
@@ -330,7 +346,11 @@ await ap.loadBindings('./bindings.yaml', resolverFromObjects({ EmailService: mai
 ```
 
 Going the other way, `writeBindingsFile()` serialises scanned modules back out —
-which is what `hono-apcore scan --format yaml` does.
+which is what `hono-apcore scan --format yaml` does. The toolkit parser rejects
+unknown document/entry keys and one-sided inline schema pairs. Supply both
+schemas or neither; move custom entry data into `metadata`. YAML annotations
+use snake_case (`requires_approval`); TypeScript tool annotations use camelCase
+(`requiresApproval`).
 
 ### CLI
 
@@ -351,6 +371,10 @@ apcore. TypeScript entries need a loader:
 ```bash
 npx tsx node_modules/.bin/hono-apcore scan ./src/app.ts
 ```
+
+The optional `ap.cli.createProgram()` builds application module commands such
+as `demo ping`, sharing the application's executor, ACL, middleware and approval
+handler. It also adapts CLI `--trace` / `--strategy` calls to the core SDK.
 
 ### Configuration (`APCORE_*`)
 

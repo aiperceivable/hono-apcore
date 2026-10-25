@@ -154,6 +154,9 @@ export function toolToScannedModule(
     annotations: toModuleAnnotations(tool.annotations),
     documentation: tool.documentation ?? null,
     examples: tool.examples ?? [],
+    version: tool.version,
+    metadata: tool.metadata,
+    display: tool.display,
   });
 
   const execute: BoundExecuteFn = async (inputs, context) => {

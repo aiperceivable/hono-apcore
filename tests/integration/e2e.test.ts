@@ -4,6 +4,8 @@ import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import type { ServerType } from '@hono/node-server';
 import { Type } from '@sinclair/typebox';
+import { Value } from '@sinclair/typebox/value';
+import { jsonSchemaToTypeBox } from 'apcore-js';
 import { createApcore, defineTool } from '../../src/index.js';
 import type { HonoApcore } from '../../src/index.js';
 import type { McpApp } from '../../src/index.js';
@@ -37,7 +39,7 @@ async function readJsonRpc(response: Response): Promise<Record<string, unknown>>
 async function rpc(method: string, params: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
   const response = await fetch(`${baseUrl}/mcp`, {
     method: 'POST',
-    headers: { ...MCP_HEADERS, 'mcp-session-id': sessionId },
+    headers: { ...MCP_HEADERS, 'mcp-session-id': sessionId, 'mcp-protocol-version': '2025-06-18' },
     body: JSON.stringify({ jsonrpc: '2.0', id: Date.now(), method, params }),
   });
   return readJsonRpc(response);
@@ -59,6 +61,29 @@ beforeAll(async () => {
         annotations: { readonly: true, idempotent: true },
         tags: ['math'],
         handler: (inputs) => ({ sum: Number(inputs.a) + Number(inputs.b) }),
+      }),
+      defineTool({
+        id: 'contract.echo', description: 'Echo nullable and free-form input',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            choice: { type: 'string', enum: ['a', 'b'] },
+            nullable: { type: ['string', 'null'] },
+            payload: { type: 'object', additionalProperties: true },
+          },
+          required: ['nullable'], additionalProperties: true,
+        },
+        handler: (inputs) => inputs,
+      }),
+      defineTool({
+        id: 'privacy.redact', description: 'Return a referenced sensitive value',
+        outputSchema: {
+          type: 'object',
+          $defs: { secret: { type: 'string', 'x-sensitive': true } },
+          properties: { secret: { $ref: '#/$defs/secret' }, visible: { type: 'string' } },
+          required: ['secret', 'visible'],
+        },
+        handler: () => ({ secret: 'do-not-leak', visible: 'public' }),
       }),
     ],
     mcp: { name: 'hono-apcore-e2e', version: '1.0.0', logLevel: 'ERROR' },
@@ -97,7 +122,9 @@ afterAll(async () => {
 
 describe('hono-apcore end to end', () => {
   it('registers both the tools and the scanned routes', () => {
-    expect(ap.registry.list().sort()).toEqual(['math.add', 'todos.get', 'todos.list']);
+    expect(ap.registry.list().sort()).toEqual([
+      'contract.echo', 'math.add', 'privacy.redact', 'todos.get', 'todos.list',
+    ]);
   });
 
   it("keeps the app's own routes working", async () => {
@@ -120,6 +147,38 @@ describe('hono-apcore end to end', () => {
     const result = await rpc('tools/call', { name: 'math.add', arguments: { a: 2, b: 3 } });
     const content = (result.result as { content: { text: string }[] }).content;
     expect(JSON.parse(content[0].text)).toEqual({ sum: 5 });
+  });
+
+  it('advertises runtime-faithful MCP input schemas and preserves explicit nulls', async () => {
+    const listed = await rpc('tools/list');
+    const tools = (listed.result as { tools: Array<{ name: string; inputSchema: Record<string, unknown> }> }).tools;
+    const schema = tools.find((tool) => tool.name === 'contract.echo')!.inputSchema;
+    expect(schema.required).toEqual(['nullable']);
+    expect(schema.additionalProperties).not.toBe(false);
+    const args = { nullable: null, payload: { arbitrary: [1, 2] }, extra: true };
+    const result = await rpc('tools/call', { name: 'contract.echo', arguments: args });
+    const content = (result.result as { content: { text: string }[] }).content;
+    expect(JSON.parse(content[0].text)).toEqual(args);
+  });
+
+  it('returns structured content derived from redacted text, including local references', async () => {
+    const response = await rpc('tools/call', { name: 'privacy.redact', arguments: {} });
+    const result = response.result as { content: { text: string }[]; structuredContent: unknown };
+    const output = JSON.parse(result.content[0].text);
+    expect(output.visible).toBe('public');
+    expect(output.secret).not.toBe('do-not-leak');
+    expect(result.structuredContent).toEqual(output);
+    expect(JSON.stringify(response)).not.toContain('do-not-leak');
+  });
+
+  it('keeps optional enum constraints in OpenAI strict exports', async () => {
+    const tools = await ap.toOpenaiTools({ strict: true }) as Array<{
+      function: { name: string; parameters: { properties: Record<string, unknown> } };
+    }>;
+    const tool = tools.find((entry) => entry.function.name === 'contract-echo')!;
+    const choice = jsonSchemaToTypeBox(tool.function.parameters.properties.choice as Record<string, unknown>);
+    for (const value of ['a', 'b', null]) expect(Value.Check(choice, value)).toBe(true);
+    for (const value of ['other', 1, false]) expect(Value.Check(choice, value)).toBe(false);
   });
 
   it('calls a scanned route over MCP, replaying it in-process', async () => {

@@ -65,15 +65,21 @@ export class HonoApcore {
   constructor(private readonly options: HonoApcoreOptions = {}) {
     this.settings = loadSettings(undefined, options.settings);
 
-    const registry = new Registry({ extensionsDir: options.extensionsDir ?? null });
-    const executor = new Executor({
+    const registry = new Registry({
+      config: options.config,
+      extensionsDir: options.extensionsDir ?? null,
+    });
+    const executorOptions = {
+      ...options.executorOptions,
       registry,
+      config: options.config,
       acl: (options.acl as ACL | null) ?? null,
       middlewares: (options.middleware as Middleware[]) ?? null,
-    });
+    };
+    const executor = new Executor(executorOptions);
 
     this.registry = new ApcoreRegistry(registry);
-    this.executor = new ApcoreExecutor(executor);
+    this.executor = new ApcoreExecutor(executor, executorOptions);
     this.contextFactory = new HonoContextFactory();
 
     this._mcp = options.mcp
@@ -86,7 +92,9 @@ export class HonoApcore {
         })
       : null;
 
-    this._cli = options.cli ? new ApcoreCliService(this.registry, options.cli) : null;
+    this._cli = options.cli
+      ? new ApcoreCliService(this.registry, options.cli, this.executor)
+      : null;
     this._a2a = options.a2a
       ? new ApcoreA2aService(this.registry, this.executor, options.a2a)
       : null;
@@ -231,7 +239,11 @@ export class HonoApcore {
   private async runInit(app?: HonoAppLike, routeOptions?: RouteScanOptions): Promise<void> {
     if (!this.settings.enabled) return;
 
-    if (this.options.extensionsDir) {
+    if (
+      this.options.extensionsDir ||
+      this.options.config?.getDeclared('extensions.root') !== undefined ||
+      this.options.config?.getDeclared('extensions.roots') !== undefined
+    ) {
       await this.registry.discover();
     }
 

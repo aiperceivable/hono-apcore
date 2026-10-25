@@ -1,12 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Context as ApcoreContext, DEFAULT_ANNOTATIONS } from 'apcore-js';
-import { createScannedModule } from 'apcore-toolkit';
+import { cloneModule, createScannedModule, DisplayResolver } from 'apcore-toolkit';
 import {
   EMPTY_OBJECT_SCHEMA,
   normalizeResult,
   scannedModuleToFunctionModule,
   toModuleAnnotations,
 } from '../../src/utils/module-factory.js';
+
+afterEach(() => { vi.restoreAllMocks(); });
 
 describe('normalizeResult', () => {
   it('turns nullish results into an empty object', () => {
@@ -70,5 +72,46 @@ describe('scannedModuleToFunctionModule', () => {
     await expect(module.execute({ value: 'hi' }, ApcoreContext.create())).resolves.toEqual({
       echoed: 'hi',
     });
+  });
+
+  it.each([
+    { display: {} },
+    { display: { alias: 'friendly', description: 'Override', guidance: 'Guide', documentation: 'Docs' } },
+    { display: { tags: ['valid', 1, null], cli: { alias: 'run' }, mcp: { description: 'MCP' }, a2a: { guidance: 'A2A' } } },
+    { display: { alias: '9 hello.world' } },
+    { display: { alias: 'fallback', cli: { alias: 'INVALID ALIAS' } } },
+    { display: { alias: '', description: false, documentation: [], guidance: '', tags: 'invalid', cli: 'invalid' } },
+    { display: {}, suggestedAlias: 'suggested', metadata: { suggested_alias: 'legacy' } },
+    { display: {}, metadata: { suggested_alias: 'legacy' } },
+    { display: { mcp: { alias: 'a'.repeat(64) } } },
+  ])('matches SDK in-memory display semantics: %j', (options) => {
+    vi.spyOn(console, 'info').mockImplementation(() => {});
+    vi.spyOn(console, 'debug').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const scanned = cloneModule(base(), options);
+    const expected = new DisplayResolver().resolve([scanned], {
+      bindingData: { [scanned.moduleId]: { display: scanned.display } },
+    })[0]!.metadata.display;
+    const actual = scannedModuleToFunctionModule(scanned, () => ({}));
+    expect(actual.metadata?.display).toEqual(expected);
+    expect(actual.display).toEqual(scanned.display);
+  });
+
+  it('does not emit stdout diagnostics or change console methods during display resolution', () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => {});
+    const debug = vi.spyOn(console, 'debug').mockImplementation(() => {});
+    scannedModuleToFunctionModule(cloneModule(base(), {
+      display: { alias: '9 hello.world' },
+    }), () => ({}));
+    expect(console.info).toBe(info);
+    expect(console.debug).toBe(debug);
+    expect(info).not.toHaveBeenCalled();
+    expect(debug).not.toHaveBeenCalled();
+  });
+
+  it('retains the MCP alias length limit', () => {
+    expect(() => scannedModuleToFunctionModule(cloneModule(base(), {
+      display: { mcp: { alias: 'a'.repeat(65) } },
+    }), () => ({}))).toThrow(/64-character hard limit/);
   });
 });

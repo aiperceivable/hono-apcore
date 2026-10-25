@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { Executor, Registry } from 'apcore-js';
+import { AlwaysDenyHandler, ExecutionPolicy, Executor, PolicyRule, Registry } from 'apcore-js';
+import { createApcore } from '../../src/core/apcore.js';
 import { ApcoreExecutor } from '../../src/core/executor.js';
 import { ApcoreRegistry } from '../../src/core/registry.js';
 
@@ -22,6 +23,19 @@ async function buildExecutor(): Promise<ApcoreExecutor> {
 }
 
 describe('ApcoreExecutor', () => {
+  it('uses the live policy for named traces after the startup policy is cleared or replaced', async () => {
+    const policy = new ExecutionPolicy([new PolicyRule('demo.run', { requiresApproval: true })], { strict: true });
+    const ap = createApcore({ executorOptions: { policy, approvalHandler: new AlwaysDenyHandler() },
+      tools: [{ id: 'demo.run', description: 'Run', handler: () => ({ done: true }) }],
+    });
+    await ap.init();
+    ap.executor.raw.setPolicy(null);
+    const [output] = await ap.executor.callWithTrace('demo.run', {}, null, { strategy: 'standard' });
+    expect(output).toEqual({ done: true });
+    ap.executor.raw.setPolicy(policy);
+    await expect(ap.executor.callWithTrace('demo.run', {}, null, { strategy: 'standard' }))
+      .rejects.toMatchObject({ code: 'APPROVAL_DENIED' });
+  });
   it('exposes the underlying executor', async () => {
     const executor = await buildExecutor();
     expect(executor.raw).toBeInstanceOf(Executor);
@@ -30,6 +44,18 @@ describe('ApcoreExecutor', () => {
   it('calls a module', async () => {
     const executor = await buildExecutor();
     await expect(executor.call('demo.echo', { value: 'hi' })).resolves.toEqual({ value: 'hi' });
+  });
+
+  it('traces calls and runs step middleware through the SDK pipeline', async () => {
+    const executor = await buildExecutor();
+    const steps: string[] = [];
+    expect(executor.addStepMiddleware({ beforeStep: (name) => { steps.push(name); } }))
+      .toBe(executor);
+    const [output, trace] = await executor.callWithTrace('demo.echo', { value: 'hi' });
+    expect(output).toEqual({ value: 'hi' });
+    expect(trace.steps.length).toBeGreaterThan(0);
+    expect(steps).toContain('execute');
+    await expect(executor.callWithTrace('demo.echo', null)).rejects.toThrow();
   });
 
   it('normalises nullish inputs to an empty object', async () => {

@@ -1,3 +1,5 @@
+import type { Config, Executor, ModuleAnnotations } from 'apcore-js';
+
 // Re-export upstream types from apcore-js
 export type {
   ModuleAnnotations,
@@ -16,19 +18,7 @@ export type {
 // ---------------------------------------------------------------------------
 
 /** Annotations describing tool behaviour characteristics. */
-export interface ApToolAnnotations {
-  readonly?: boolean;
-  destructive?: boolean;
-  idempotent?: boolean;
-  requiresApproval?: boolean;
-  openWorld?: boolean;
-  streaming?: boolean;
-  cacheable?: boolean;
-  cacheTtl?: number;
-  cacheKeyFields?: string[] | null;
-  paginated?: boolean;
-  paginationStyle?: 'cursor' | 'offset' | 'page';
-}
+export type ApToolAnnotations = Partial<ModuleAnnotations>;
 
 /** Example entry for a tool invocation. */
 export interface ApToolExample {
@@ -73,6 +63,12 @@ export interface ApToolDefinition {
   tags?: string[];
   documentation?: string | null;
   examples?: ApToolExample[];
+  /** Module version exposed in discovery and binding exports. */
+  version?: string;
+  /** SDK extension metadata, including `async: true` for MCP background tasks. */
+  metadata?: Record<string, unknown>;
+  /** Sparse display overlay for CLI, MCP and A2A surfaces. */
+  display?: Record<string, unknown> | null;
   /**
    * Per-parameter prose merged into the input schema's property descriptions.
    *
@@ -107,6 +103,13 @@ export interface ApToolsetOptions {
 
 /** Options accepted by {@link createApcore} / the {@link HonoApcore} constructor. */
 export interface HonoApcoreOptions {
+  /** SDK configuration shared by the Registry and Executor. */
+  config?: Config;
+  /** SDK strategy, approval, policy, toggle and event options. */
+  executorOptions?: Omit<
+    ConstructorParameters<typeof Executor>[0],
+    'registry' | 'config' | 'acl' | 'middlewares'
+  >;
   /** Directory scanned by `Registry.discover()` for filesystem extensions. */
   extensionsDir?: string | null;
   /** apcore `ACL` instance enforced by the Executor on every call. */
@@ -131,6 +134,8 @@ export interface HonoApcoreOptions {
 
 /** Options for the MCP surface. Mirrors `apcore-mcp`'s serve options. */
 export interface ApcoreMcpOptions {
+  /** SDK Async Task Bridge controls; enabled by default upstream. */
+  async?: boolean | { enabled?: boolean; maxConcurrent?: number; maxTasks?: number };
   transport?: 'stdio' | 'streamable-http' | 'sse';
   host?: string;
   port?: number;
@@ -207,6 +212,10 @@ export interface ApcoreCliOptions {
 
 /** Options for the A2A surface. */
 export interface ApcoreA2aOptions {
+  pushNotifications?: boolean;
+  sysModules?: boolean;
+  /** Include governance refusal details in A2A errors. Default: false. */
+  discloseRefusalReason?: boolean;
   name?: string;
   description?: string;
   version?: string;

@@ -26,6 +26,12 @@ beforeEach(() => {
 });
 
 describe('ApcoreA2aService', () => {
+  it('forwards system skill, push notification and refusal-detail controls', async () => {
+    const options = { sysModules: false, pushNotifications: true, discloseRefusalReason: true };
+    const service = await build(options);
+    await service.asyncServe();
+    expect(asyncServe.mock.calls[0][1]).toEqual(options);
+  });
   it('starts out stopped and counts the skills', async () => {
     const service = await build();
     expect(service.isRunning).toBe(false);

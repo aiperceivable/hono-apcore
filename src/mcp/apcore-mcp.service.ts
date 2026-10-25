@@ -15,6 +15,7 @@ export interface McpApp {
 
 /** Options forwarded to both `serve()` and `asyncServe()`. */
 const SHARED_OPTION_KEYS = [
+  'async',
   'name',
   'version',
   'tags',
@@ -128,7 +129,7 @@ export class ApcoreMcpService {
     };
 
     for (const [key, value] of Object.entries(overrides)) {
-      if (value !== undefined) serveOptions[key] = value;
+      if (value !== undefined) serveOptions[RENAMED_OPTIONS[key] ?? key] = value;
     }
 
     await (serve as (executor: unknown, options: unknown) => Promise<void>)(
@@ -163,6 +164,7 @@ export class ApcoreMcpService {
       explorerTitle: this.options.explorerTitle,
       explorerProjectName: this.options.explorerProjectName,
       explorerProjectUrl: this.options.explorerProjectUrl,
+      dynamic: options?.dynamic ?? this.options.dynamic,
     };
 
     if (options?.endpoint !== undefined) asyncOptions['endpoint'] = options.endpoint;

@@ -15,17 +15,17 @@ importers:
         specifier: ^0.34.52
         version: 0.34.52
       apcore-js:
-        specifier: ^0.27.0
-        version: 0.27.0
+        specifier: ^0.32.2
+        version: 0.32.2
       apcore-mcp:
-        specifier: ^0.18.1
-        version: 0.18.1(@sinclair/typebox@0.34.52)(zod@4.4.3)
+        specifier: ^0.23.1
+        version: 0.23.1(@sinclair/typebox@0.34.52)(zod@4.4.3)
       hono:
         specifier: ^4.13.4
         version: 4.13.4
       hono-apcore:
         specifier: file:../..
-        version: file:../..(@hono/node-server@2.1.1(hono@4.13.4))(@sinclair/typebox@0.34.52)(apcore-mcp@0.18.1(@sinclair/typebox@0.34.52)(zod@4.4.3))(hono@4.13.4)(zod@4.4.3)
+        version: file:../..(@hono/node-server@2.1.1(hono@4.13.4))(@sinclair/typebox@0.34.52)(apcore-mcp@0.23.1(@sinclair/typebox@0.34.52)(zod@4.4.3))(hono@4.13.4)(zod@4.4.3)
     devDependencies:
       tsx:
         specifier: ^4.20.0
@@ -226,17 +226,17 @@ packages:
   ajv@8.20.0:
     resolution: {integrity: sha512-Thbli+OlOj+iMPYFBVBfJ3OmCAnaSyNn4M1vz9T6Gka5Jt9ba/HIR56joy65tY6kx/FCF5VXNB819Y7/GUrBGA==}
 
-  apcore-js@0.27.0:
-    resolution: {integrity: sha512-Q3O3Ef2+2to7Z9wjsMjoDQ37FSityUX8EiWUVITqDxLp4qDFTMDq+9n9NuydHhWhHoyXZ5mG9Xt4yZPIwcTQIQ==}
+  apcore-js@0.32.2:
+    resolution: {integrity: sha512-+hANsBxTS1IIWAgVxCS7NV6d4s+aQlJNljSLJul70ItrMdmILpeebNlY9sjgGZV3HE2H0J89dUkkezggwtTSmg==}
     engines: {node: '>=20.0.0'}
 
-  apcore-mcp@0.18.1:
-    resolution: {integrity: sha512-2rxPEXj76x/+m6ib3XzBCkApKT8uAmcTBonk4M1/92a5P7i7QNPgah7uyu1DmIeUTk/+EOpSqDR7PhRMK9CFwA==}
-    engines: {node: '>=18.0.0'}
+  apcore-mcp@0.23.1:
+    resolution: {integrity: sha512-X2WIR5iMxY1Y5F6TmoV3uqIv635Kaf/J599vkIFrnvS/C2q64fJqnCB3ZLmAM9w7dQJ4n94G6Wna0fdrtZfhmQ==}
+    engines: {node: '>=20.0.0'}
     hasBin: true
 
-  apcore-toolkit@0.10.1:
-    resolution: {integrity: sha512-N+7A/7pzBe0FqOgrVM7SieiwFapzLA4tdL/U6Smvx5Mpeb2PzKqL9+dYm+tmJDvE6Y8YVYSdjX/oZKrnRddFCw==}
+  apcore-toolkit@0.14.0:
+    resolution: {integrity: sha512-S1vBRUx379NXMVn1Kg2qXpd0VXDmNRTyno43y8mx4sC8f2ge7yprBxWooczLkkHE5y7s7Sd8ReCfaNhW4jmtiw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@sinclair/typebox': '>=0.31.0'
@@ -408,13 +408,13 @@ packages:
 
   hono-apcore@file:../..:
     resolution: {directory: ../.., type: directory}
-    engines: {node: '>=18.0.0'}
+    engines: {node: '>=20.0.0'}
     hasBin: true
     peerDependencies:
       '@hono/node-server': '>=1.13.0'
-      apcore-a2a: '>=0.5.0'
-      apcore-cli: '>=0.10.5'
-      apcore-mcp: '>=0.18.0'
+      apcore-a2a: '>=0.8.3'
+      apcore-cli: '>=0.12.5'
+      apcore-mcp: '>=0.23.1'
       hono: '>=4.0.0'
       zod: '>=3.23.0'
     peerDependenciesMeta:
@@ -807,17 +807,18 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  apcore-js@0.27.0:
+  apcore-js@0.32.2:
     dependencies:
       '@sinclair/typebox': 0.34.52
       js-yaml: 4.3.1
       uuid: 11.1.1
 
-  apcore-mcp@0.18.1(@sinclair/typebox@0.34.52)(zod@4.4.3):
+  apcore-mcp@0.23.1(@sinclair/typebox@0.34.52)(zod@4.4.3):
     dependencies:
       '@modelcontextprotocol/sdk': 1.30.0(zod@4.4.3)
-      apcore-js: 0.27.0
-      apcore-toolkit: 0.10.1(@sinclair/typebox@0.34.52)
+      ajv: 8.20.0
+      apcore-js: 0.32.2
+      apcore-toolkit: 0.14.0(@sinclair/typebox@0.34.52)
       jsonwebtoken: 9.0.3
       mcp-embedded-ui: 0.5.0
     transitivePeerDependencies:
@@ -826,11 +827,11 @@ snapshots:
       - supports-color
       - zod
 
-  apcore-toolkit@0.10.1(@sinclair/typebox@0.34.52):
+  apcore-toolkit@0.14.0(@sinclair/typebox@0.34.52):
     dependencies:
       '@sinclair/typebox': 0.34.52
       ajv: 8.20.0
-      apcore-js: 0.27.0
+      apcore-js: 0.32.2
       js-yaml: 4.3.1
 
   argparse@2.0.1: {}
@@ -1042,15 +1043,15 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hono-apcore@file:../..(@hono/node-server@2.1.1(hono@4.13.4))(@sinclair/typebox@0.34.52)(apcore-mcp@0.18.1(@sinclair/typebox@0.34.52)(zod@4.4.3))(hono@4.13.4)(zod@4.4.3):
+  hono-apcore@file:../..(@hono/node-server@2.1.1(hono@4.13.4))(@sinclair/typebox@0.34.52)(apcore-mcp@0.23.1(@sinclair/typebox@0.34.52)(zod@4.4.3))(hono@4.13.4)(zod@4.4.3):
     dependencies:
-      apcore-js: 0.27.0
-      apcore-toolkit: 0.10.1(@sinclair/typebox@0.34.52)
+      apcore-js: 0.32.2
+      apcore-toolkit: 0.14.0(@sinclair/typebox@0.34.52)
       hono: 4.13.4
       js-yaml: 4.3.1
     optionalDependencies:
       '@hono/node-server': 2.1.1(hono@4.13.4)
-      apcore-mcp: 0.18.1(@sinclair/typebox@0.34.52)(zod@4.4.3)
+      apcore-mcp: 0.23.1(@sinclair/typebox@0.34.52)(zod@4.4.3)
       zod: 4.4.3
     transitivePeerDependencies:
       - '@sinclair/typebox'

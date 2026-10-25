@@ -129,6 +129,9 @@ export class ApcoreRegistry {
       documentation: def.documentation ?? null,
       examples: (def.examples ?? []) as never[],
       metadata: def.metadata ?? {},
+      version: def.version,
+      display: (this.registry.get(moduleId) as { display?: Record<string, unknown> | null })
+        ?.display ?? null,
     });
   }
 

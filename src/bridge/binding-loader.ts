@@ -1,32 +1,12 @@
 import { readFile } from 'node:fs/promises';
 import * as yaml from 'js-yaml';
-import { createScannedModule } from 'apcore-toolkit';
+import { parseBindingDocument } from 'apcore-toolkit';
 import type { ApcoreRegistry } from '../core/registry.js';
 import {
   EMPTY_OBJECT_SCHEMA,
   normalizeResult,
-  toModuleAnnotations,
 } from '../utils/module-factory.js';
 import type { BoundExecuteFn } from '../utils/module-factory.js';
-import type { ApToolAnnotations } from '../types.js';
-
-/** A single binding entry parsed from YAML. */
-interface BindingEntry {
-  module_id: string;
-  target: string;
-  description: string;
-  input_schema?: unknown;
-  output_schema?: unknown;
-  annotations?: Record<string, unknown>;
-  tags?: string[];
-  documentation?: string;
-}
-
-/** Top-level structure of a bindings YAML file. */
-interface BindingsFile {
-  bindings?: BindingEntry[];
-}
-
 /**
  * Resolves the `"Object.method"` target of a binding entry to a live handler.
  *
@@ -82,12 +62,15 @@ export class ApBindingLoader {
    * @returns The module IDs that were registered.
    */
   async loadFromString(content: string): Promise<string[]> {
-    const parsed = (yaml.load(content) ?? {}) as BindingsFile;
-    const bindings = parsed.bindings ?? [];
+    const parsed: unknown = yaml.load(content);
+    // Preserve empty documents; validate non-empty documents with the SDK parser.
+    const empty = parsed == null || (
+      typeof parsed === 'object' && !Array.isArray(parsed) && Object.keys(parsed).length === 0
+    );
+    const bindings = parseBindingDocument(empty ? { bindings: [] } : parsed);
     const ids: string[] = [];
 
     for (const binding of bindings) {
-      const moduleId = binding.module_id;
       const handler = this.resolveTarget?.(binding.target);
 
       const execute: BoundExecuteFn = handler
@@ -96,18 +79,13 @@ export class ApBindingLoader {
             error: `No handler resolved for binding target "${binding.target}"`,
           });
 
-      const scanned = createScannedModule({
-        moduleId,
-        description: binding.description,
-        inputSchema:
-          (binding.input_schema as Record<string, unknown>) ?? { ...EMPTY_OBJECT_SCHEMA },
-        outputSchema:
-          (binding.output_schema as Record<string, unknown>) ?? { ...EMPTY_OBJECT_SCHEMA },
-        tags: binding.tags ?? [],
-        target: binding.target,
-        annotations: toModuleAnnotations(binding.annotations as ApToolAnnotations | undefined),
-        documentation: binding.documentation ?? null,
-      });
+      const scanned = {
+        ...binding,
+        inputSchema: Object.keys(binding.inputSchema).length
+          ? binding.inputSchema : { ...EMPTY_OBJECT_SCHEMA },
+        outputSchema: Object.keys(binding.outputSchema).length
+          ? binding.outputSchema : { ...EMPTY_OBJECT_SCHEMA },
+      };
 
       ids.push(await this.registry.registerScanned(scanned, execute));
     }

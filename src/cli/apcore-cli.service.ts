@@ -1,3 +1,8 @@
+import { CallbackApprovalHandler, Context as ApcoreContext, createApprovalResult, Executor } from 'apcore-js';
+import type { ApprovalResult, Context } from 'apcore-js';
+import { annotationsToDict } from 'apcore-toolkit';
+import type { CreateCliOptions } from 'apcore-cli';
+import { ApcoreExecutor } from '../core/executor.js';
 import type { ApcoreRegistry } from '../core/registry.js';
 import type { ApcoreCliOptions } from '../types.js';
 
@@ -18,10 +23,16 @@ import type { ApcoreCliOptions } from '../types.js';
  */
 export class ApcoreCliService {
   private configured = false;
+  private readonly callOptions = new WeakMap<object, {
+    autoApprove: boolean;
+    timeout?: number;
+    moduleId: string;
+  }>();
 
   constructor(
     private readonly registry: ApcoreRegistry,
     private readonly options: ApcoreCliOptions = {},
+    private readonly executor?: ApcoreExecutor,
   ) {}
 
   /** Number of modules currently registered. */
@@ -42,17 +53,102 @@ export class ApcoreCliService {
     const cli = await import('apcore-cli');
     await this.applyModuleOptions();
 
-    return (
-      cli.createCli as (
-        dir?: string,
-        progName?: string,
-        verboseHelp?: boolean,
-      ) => unknown
-    )(
-      extensionsDir ?? this.options.extensionsDir,
-      this.options.progName,
-      this.options.verboseHelp ?? false,
-    );
+    const executor = this.executor ?? new ApcoreExecutor(new Executor({ registry: this.registry.raw }));
+    const raw = executor.raw;
+    let approvalOptions = { autoApprove: false, timeout: undefined as number | undefined };
+    // Child Contexts share data, so approval options follow nested SDK calls
+    // without adding integration keys to the public context or global state.
+    const callOptions = this.callOptions;
+    const cliContext = (context?: Context | null): Context =>
+      context ?? (cli.buildCliContext() as Context | null) ?? ApcoreContext.create();
+    const runWithContext = async <T>(id: string, context: Context | null | undefined, run: (ctx: Context) => Promise<T>): Promise<T> => {
+      const ctx = cliContext(context);
+      callOptions.set(ctx.data, { ...approvalOptions, moduleId: id });
+      try {
+        return await run(ctx);
+      } finally {
+        callOptions.delete(ctx.data);
+      }
+    };
+    const fallback = new CallbackApprovalHandler(async (request) => {
+      const options = callOptions.get(request.context.data);
+      // CLI's own annotation precheck has already completed for the root
+      // command. Nested calls and ACL/policy-only requirements still ask here.
+      if (
+        options?.moduleId === request.moduleId &&
+        this.registry.getDefinition(request.moduleId)?.annotations?.requiresApproval
+      ) {
+        return createApprovalResult({ status: 'approved', approvedBy: 'cli_precheck' });
+      }
+      const terminal = new cli.CliApprovalHandler(options?.autoApprove, options?.timeout);
+      const result = await terminal.requestApproval({
+        module_id: request.moduleId,
+        requires_approval: true,
+        annotations: annotationsToDict(request.annotations),
+      });
+      return createApprovalResult({
+        status: result.status as ApprovalResult['status'],
+        approvedBy: result.approved_by as string | undefined,
+        reason: result.reason as string | undefined,
+      });
+    });
+    // CLI 0.12 reads wire-format annotation keys. Keep that projection at
+    // the surface boundary; the shared Registry retains SDK annotations.
+    const registry: NonNullable<CreateCliOptions['registry']> = {
+      list: () => this.registry.list(),
+      getDefinition: (id) => {
+        const definition = this.registry.getDefinition(id);
+        return definition ? {
+          ...definition,
+          annotations: annotationsToDict(definition.annotations) ?? undefined,
+        } : null;
+      },
+    };
+    // Adapt the CLI's two-argument stream and third-position trace options.
+    // Only supply its approval fallback when the host has no handler.
+    const cliExecutor = {
+      registry,
+      call: (id: string, input: Record<string, unknown>, context?: Context | null) =>
+        runWithContext(id, context, (ctx) => raw.call(id, input, ctx)),
+      validate: raw.validate.bind(raw),
+      stream: async function* (id: string, input: Record<string, unknown>) {
+        const ctx = cliContext();
+        callOptions.set(ctx.data, { ...approvalOptions, moduleId: id });
+        try {
+          yield* raw.stream(id, input, ctx);
+        } finally {
+          callOptions.delete(ctx.data);
+        }
+      },
+      callWithTrace: (id: string, input: Record<string, unknown>, options?: { strategy?: string }) =>
+        runWithContext(id, undefined, (ctx) => executor.callWithTrace(id, input, ctx, options)),
+      describePipeline: raw.describePipeline.bind(raw),
+      listStrategies: raw.listStrategies.bind(raw),
+      currentStrategy: raw.currentStrategy,
+      governanceState: raw.governanceState.bind(raw),
+      setAcl: raw.setAcl.bind(raw),
+      setApprovalHandler: () => {
+        if (!raw.governanceState().approvalHandlerConfigured) raw.setApprovalHandler(fallback);
+      },
+    };
+    const bridge = cliExecutor as unknown as NonNullable<CreateCliOptions['executor']>;
+    const program = cli.createCli({
+      extensionsDir: extensionsDir ?? this.options.extensionsDir,
+      progName: this.options.progName,
+      allOptions: this.options.verboseHelp ?? false,
+      registry,
+      executor: bridge,
+    });
+    program.hook('preAction', (_parent, command) => {
+      const options = command.opts();
+      approvalOptions = { autoApprove: options.yes === true, timeout: options.approvalTimeout };
+    });
+    const modules = new cli.GroupedModuleGroup(registry, bridge);
+    for (const name of modules.listCommands()) {
+      const command = modules.getCommand(name);
+      if (command) program.addCommand(command);
+    }
+    return program;
   }
 
   /**

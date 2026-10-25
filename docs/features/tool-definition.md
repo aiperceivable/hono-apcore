@@ -52,6 +52,9 @@ single obvious place to look up the shape.
 | `documentation` | | Long-form prose |
 | `params` | | Per-parameter prose merged into the input schema |
 | `examples` | | `{ title, inputs, output, description? }` |
+| `version` | | Module version, defaults to `1.0.0` |
+| `metadata` | | SDK extension metadata, including `async: true` for background jobs |
+| `display` | | Sparse CLI/MCP/A2A display overlay using toolkit-compatible resolution |
 
 ### Module IDs
 
@@ -80,9 +83,14 @@ comes out.
 | `openWorld` | Reaches systems outside this process |
 | `streaming` | Yields incremental results |
 | `cacheable`, `cacheTtl`, `cacheKeyFields` | Cacheability of the result |
-| `paginated`, `paginationStyle` | `cursor` / `offset` / `page` |
+| `paginated`, `paginationStyle` | Pagination style string, e.g. `cursor` / `offset` / `page` |
+| `discoverable` | Hide from enumeration when false; exact-ID calls still work |
+| `extra` | SDK extension annotations, including `mcp_async` |
 
 Anything you leave out takes its value from apcore's `DEFAULT_ANNOTATIONS`.
+Annotations use the SDK's camelCase names at runtime. YAML exports and the CLI
+surface receive snake_case projections; this keeps approval and cache settings
+consistent across those boundaries.
 
 ### Handler contract
 

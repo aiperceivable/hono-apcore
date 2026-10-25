@@ -85,6 +85,9 @@ export class ApcoreA2aService {
       metrics: opts.metrics,
       logLevel: opts.logLevel,
       shutdownTimeout: opts.shutdownTimeout,
+      pushNotifications: opts.pushNotifications,
+      sysModules: opts.sysModules,
+      discloseRefusalReason: opts.discloseRefusalReason,
     };
 
     for (const key of Object.keys(result)) {

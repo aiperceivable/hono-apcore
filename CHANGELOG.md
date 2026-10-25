@@ -7,7 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-(nothing yet)
+### Changed
+
+- Raise SDK floors to apcore-js 0.32.2, apcore-toolkit 0.14.0,
+  apcore-mcp 0.23.1, apcore-cli 0.12.5 and apcore-a2a 0.8.3.
+  Refresh both lockfiles and the demo; require Node.js 20+.
+- Parse bindings through toolkit 0.14's standard parser. Unknown keys and
+  incomplete schema pairs now fail; empty documents remain supported.
+
+### Added
+
+- Shared SDK `config` and `executorOptions` for strategies, approval handlers,
+  execution policies, toggles and events; discover explicitly configured roots.
+- Executor `callWithTrace` and `addStepMiddleware` support.
+- Tool metadata, display overlays and versions; complete SDK annotation types,
+  including discovery visibility and extension metadata.
+- MCP async-task controls and A2A system-skill, push-notification and
+  refusal-detail controls.
+
+### Fixed
+
+- Preserve camelCase runtime annotations, including approval, open-world and
+  cache settings; convert to snake_case only at YAML and CLI boundaries.
+- Wire CLI commands to registered Hono modules and the host executor. Adapt
+  trace signatures and named strategies, and preserve the host approval handler.
+- Preserve binding versions, metadata, examples and display overlays; resolve
+  display metadata for surfaces using toolkit-compatible resolution.
+- Forward embedded MCP dynamic discovery and rename per-start ACL/middleware
+  overrides consistently.
+- Enforce ACL-derived CLI approval with a fallback only when the host has no
+  handler; scope `--yes` to its invocation and avoid duplicate terminal prompts.
+- Carry CLI identity through streaming calls and use live governance providers
+  when resolving named execution strategies.
+- Keep display registration silent with a pure in-memory projection verified
+  against toolkit behavior, preserving JSON exports and stdio registration.
+
+### Verification
+
+- Add real CLI and MCP regressions covering shared middleware, approval,
+  tracing, nullability, optional enum constraints, structured output and
+  reference-based sensitive-field redaction.
 
 ---
 
