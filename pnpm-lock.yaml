@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       apcore-js:
-        specifier: '>=0.32.2'
-        version: 0.32.2
+        specifier: '>=0.32.3'
+        version: 0.32.3
       apcore-toolkit:
-        specifier: '>=0.14.0'
-        version: 0.14.0(@sinclair/typebox@0.34.52)
+        specifier: '>=0.14.1'
+        version: 0.14.1(@sinclair/typebox@0.34.52)
       js-yaml:
         specifier: ^4.1.0
         version: 4.3.1
@@ -37,14 +37,14 @@ importers:
         specifier: ^3.2.0
         version: 3.2.7(vitest@3.2.7(@types/node@20.19.43)(tsx@4.23.12))
       apcore-a2a:
-        specifier: ^0.8.3
-        version: 0.8.3(@sinclair/typebox@0.34.52)
+        specifier: ^0.8.5
+        version: 0.8.5(@sinclair/typebox@0.34.52)
       apcore-cli:
-        specifier: ^0.12.5
-        version: 0.12.5(apcore-js@0.32.2)(apcore-toolkit@0.14.0(@sinclair/typebox@0.34.52))
+        specifier: ^0.12.7
+        version: 0.12.7(apcore-js@0.32.3)(apcore-toolkit@0.14.1(@sinclair/typebox@0.34.52))
       apcore-mcp:
-        specifier: ^0.23.1
-        version: 0.23.1(@sinclair/typebox@0.34.52)(zod@4.4.3)
+        specifier: ^0.23.3
+        version: 0.23.3(@sinclair/typebox@0.34.52)(zod@4.4.3)
       apdev-js:
         specifier: ^0.2.0
         version: 0.2.4(typescript@5.9.3)
@@ -66,19 +66,32 @@ importers:
 
 packages:
 
-  '@a2a-js/sdk@1.0.1':
-    resolution: {integrity: sha512-CJQdh3Wzwo8qIx5UUkSJ7+7BEI16PB+MXMHHNSmx8JQsQed2HlQgvx1ENOiKUfYA3PlcEvxIwv14dBblhDuPmw==}
+  '@a2a-js/sdk@1.3.0':
+    resolution: {integrity: sha512-OpK4nygUnLKlpTFZlM2IrYu7f3c/B7c4u4Z14+vgMq24lEINTVCxH/BqZx+GL92rNf7CoBL5oTP5UhNsl75yyg==}
     engines: {node: '>=20'}
+    hasBin: true
     peerDependencies:
       '@bufbuild/protobuf': ^2.10.2
       '@grpc/grpc-js': ^1.11.0
+      better-sqlite3: ^12.0.0 || ^13.0.0
       express: ^4.21.2 || ^5.1.0
+      kysely: ^0.28.17 || ^0.29.0
+      mysql2: ^3.0.0
+      pg: ^8.0.0
     peerDependenciesMeta:
       '@bufbuild/protobuf':
         optional: true
       '@grpc/grpc-js':
         optional: true
+      better-sqlite3:
+        optional: true
       express:
+        optional: true
+      kysely:
+        optional: true
+      mysql2:
+        optional: true
+      pg:
         optional: true
 
   '@ampproject/remapping@2.3.0':
@@ -521,30 +534,30 @@ packages:
     resolution: {integrity: sha512-4Dj6M28JB+oAH8kFkTLUo+a2jwOFkuqb3yucU0CANcRRUbxS0cP0nZYCGjcc3BNXwRIsUVmDGgzawme7zvJHvg==}
     engines: {node: '>=12'}
 
-  apcore-a2a@0.8.3:
-    resolution: {integrity: sha512-Q4Cbzc+MtzlPqLQ4KQyCjfGBd8SOwZ9SgWSY+GqFneiKTvx1T3aqVk+b+a11OW7N1gn8a3/hYP0KA1xucrlhkg==}
+  apcore-a2a@0.8.5:
+    resolution: {integrity: sha512-FLdwejVRXZuhV+VOF2kNSgNXK8w9wqVZ7wb7/Ft+oqpjkMh8z5kDm/xrK6+auICbMS/NyodvHIPNRzo5P2KvJw==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
-  apcore-cli@0.12.5:
-    resolution: {integrity: sha512-SOmKADxViJ2b3YehAZI0Fox+kHYNqjStEMHlWerV4VCA3mIOjeDdrLd5enjmwdxVvY+QEaL3lsDWxQhjBMX5Ow==}
+  apcore-cli@0.12.7:
+    resolution: {integrity: sha512-JBKk/HYP2RXuWKimfD+mBMOAVRyilYayKNSnE6mK16MxH1HWtdpfLfHJY5w/eOEGwCOVRC2YgGxwIFfM4PNydg==}
     engines: {node: '>=20.0.0'}
     hasBin: true
     peerDependencies:
-      apcore-js: '>=0.32.2'
-      apcore-toolkit: '>=0.14.0'
+      apcore-js: '>=0.32.3'
+      apcore-toolkit: '>=0.14.1'
 
-  apcore-js@0.32.2:
-    resolution: {integrity: sha512-+hANsBxTS1IIWAgVxCS7NV6d4s+aQlJNljSLJul70ItrMdmILpeebNlY9sjgGZV3HE2H0J89dUkkezggwtTSmg==}
+  apcore-js@0.32.3:
+    resolution: {integrity: sha512-kmIDULt35c4vv9fxopnUomDi2Vvb9TzX4JdO9xfv6+XAE62OxuH4a6cvIQCuu62A5ESsIiwa2evhNX+PbPyqtA==}
     engines: {node: '>=20.0.0'}
 
-  apcore-mcp@0.23.1:
-    resolution: {integrity: sha512-X2WIR5iMxY1Y5F6TmoV3uqIv635Kaf/J599vkIFrnvS/C2q64fJqnCB3ZLmAM9w7dQJ4n94G6Wna0fdrtZfhmQ==}
+  apcore-mcp@0.23.3:
+    resolution: {integrity: sha512-iT5EDtT6yU/g2pielWr4lHq44kVgKwNey8aEQkXc///XftkwZEsjI0Z6GdNjpSIsHxwW9RWMTJXyVMYtavMJvg==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
-  apcore-toolkit@0.14.0:
-    resolution: {integrity: sha512-S1vBRUx379NXMVn1Kg2qXpd0VXDmNRTyno43y8mx4sC8f2ge7yprBxWooczLkkHE5y7s7Sd8ReCfaNhW4jmtiw==}
+  apcore-toolkit@0.14.1:
+    resolution: {integrity: sha512-sB0rkV54b2XYz6o2yQWCUZ9KF2YWR+ETXtn1jDjVIvNxy2WNF/+7BDqQBbxbAwwTLz7+iP8WDJ+26RXz2XWEGA==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@sinclair/typebox': '>=0.31.0'
@@ -583,6 +596,10 @@ packages:
 
   body-parser@2.3.0:
     resolution: {integrity: sha512-2cGmJupaNgg+QUwVLAucDuWuoMZ6EX9iHDRswZ5lsNYEmwPaRknMPCLZz07yTzVq/83p4o/wzbDZbBrTvGGTIw==}
+    engines: {node: '>=18'}
+
+  body-parser@2.4.0:
+    resolution: {integrity: sha512-Ifk1KcLrxaGt1occQagQNFNNOqRt1LFuehEnHHzB8Z6cRgIxRU1TBaiIsUiCdA+gy5PL7Y1IX31DNKkRmxtXjQ==}
     engines: {node: '>=18'}
 
   brace-expansion@2.1.4:
@@ -642,6 +659,10 @@ packages:
 
   content-disposition@1.1.0:
     resolution: {integrity: sha512-5jRCH9Z/+DRP7rkvY83B+yGIGX96OYdJmzngqnw2SBSxqCFPd0w2km3s5iawpGX8krnwSGmF0FW5Nhr0Hfai3g==}
+    engines: {node: '>=18'}
+
+  content-disposition@2.0.1:
+    resolution: {integrity: sha512-e+H0ZXHSWYrENhQzw1LPuP4oF5MzVKmDU6d3hxlvaPEYLLg62MxtQNPRx4SYSuYJSBUgnQIG4HIN2tEtNv7Dog==}
     engines: {node: '>=18'}
 
   content-type@1.0.5:
@@ -777,6 +798,10 @@ packages:
 
   express@5.2.1:
     resolution: {integrity: sha512-hIS4idWWai69NezIdRt2xFVofaF4j+6INOpJlVOLDO8zXGpUVEVzIYk12UUi2JzjEzWL3IOAxcTubgz9Po0yXw==}
+    engines: {node: '>= 18'}
+
+  express@5.3.0:
+    resolution: {integrity: sha512-qCqy1xSoaugxOD4IVHb1ZWdkvCF2W3aE2okKouWj8VwJ+ztskSiXoBnCSJqfKT+cVPJhuJqe9YLbY425+Zh00g==}
     engines: {node: '>= 18'}
 
   fast-deep-equal@3.1.3:
@@ -917,6 +942,9 @@ packages:
   jose@6.2.10:
     resolution: {integrity: sha512-iiW7J9qRFlGxvCOIBDBDxFePQSn7ZMAnrYGhrrOo6siO/MIqwfyilLR27pkfDgUk+raLuzADS8A3S/KLBisc0g==}
 
+  jose@6.2.13:
+    resolution: {integrity: sha512-7TIg10ZE1x82YediN+lcrPNvGMKge9yFHQD+Qho/b8y2adfugU3AsvvHfxV0fzyFllT6l9xCjf4RWY9g/Z9PJQ==}
+
   js-tokens@10.0.0:
     resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
 
@@ -1044,8 +1072,8 @@ packages:
     resolution: {integrity: sha512-NMPBRMJgiQHjbd8phG3Vebdx4kZ1H121rbl5IkMqeOsahptB9BKo/d7oJ3zTXqTgagn2bWlNSXkh0QUGM31RYg==}
     engines: {node: '>=18'}
 
-  node-abi@3.95.0:
-    resolution: {integrity: sha512-T9iGctuocf0qIWFFOTxPzjT5q0SILqaBYXt272tlBHvTKC5+3JnkMirLxNJNkXHtFyBjU2Jx+NL4Zipr0B/c6Q==}
+  node-abi@3.101.0:
+    resolution: {integrity: sha512-bkb/RkuWCE64eWu1PCh3Fu2pGc9mKRs+kOE+FU2bGHRYlQa86/D321DSATV54AsCQMKz3/xSt9sRgraZTpqdhQ==}
     engines: {node: '>=10'}
 
   node-addon-api@4.3.0:
@@ -1061,6 +1089,10 @@ packages:
 
   on-finished@2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
+    engines: {node: '>= 0.8'}
+
+  on-finished@2.4.2:
+    resolution: {integrity: sha512-ATWUv387i+nLD49EiDoOft5scf32Vsdz3ktrQJG9bi7jRFmaXTssvyvj1EmeKVVgvesbqUtvQQvaS2TpTukAZQ==}
     engines: {node: '>= 0.8'}
 
   once@1.4.0:
@@ -1116,11 +1148,19 @@ packages:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}
     engines: {node: '>= 0.10'}
 
+  proxy-addr@2.0.8:
+    resolution: {integrity: sha512-5nnx0yGyVUcY6t9RnWcARWtwT9F1D8O9rt08htPvnd49W1IgZtmLkhu9WfMzQj1cFxjHIO6connUNVW5k7AVyQ==}
+    engines: {node: '>= 0.10'}
+
   pump@3.0.4:
     resolution: {integrity: sha512-VS7sjc6KR7e1ukRFhQSY5LM2uBWAUPiOPa/A3mkKmiMwSmRFUITt0xuj+/lesgnCv+dPIEYlkzrcyXgquIHMcA==}
 
   qs@6.15.3:
     resolution: {integrity: sha512-O9gl3zCl5h5blw1KGUzQKhA5oUXSl8rwUIM5o0S3nCXMliSvy5Dzx7/DJcI+SwgICv+IneSZwhBh1oSyEHA71A==}
+    engines: {node: '>=0.6'}
+
+  qs@6.16.1:
+    resolution: {integrity: sha512-5Px6J7rfHBAGUhNQ3es4YzcOdBBw0SDcVtThJml4RdnKw4tKs2epA0kPZ+K8X+WiHktT93RHVcQ/3ym5aTCgtg==}
     engines: {node: '>=0.6'}
 
   range-parser@1.3.0:
@@ -1435,12 +1475,11 @@ packages:
 
 snapshots:
 
-  '@a2a-js/sdk@1.0.1(express@5.2.1)':
+  '@a2a-js/sdk@1.3.0(express@5.3.0)':
     dependencies:
-      jose: 6.2.10
-      uuid: 11.1.1
+      jose: 6.2.13
     optionalDependencies:
-      express: 5.2.1
+      express: 5.3.0
 
   '@ampproject/remapping@2.3.0':
     dependencies:
@@ -1776,42 +1815,46 @@ snapshots:
 
   ansi-styles@6.2.3: {}
 
-  apcore-a2a@0.8.3(@sinclair/typebox@0.34.52):
+  apcore-a2a@0.8.5(@sinclair/typebox@0.34.52):
     dependencies:
-      '@a2a-js/sdk': 1.0.1(express@5.2.1)
-      apcore-js: 0.32.2
-      apcore-toolkit: 0.14.0(@sinclair/typebox@0.34.52)
-      express: 5.2.1
+      '@a2a-js/sdk': 1.3.0(express@5.3.0)
+      apcore-js: 0.32.3
+      apcore-toolkit: 0.14.1(@sinclair/typebox@0.34.52)
+      express: 5.3.0
       jsonwebtoken: 9.0.3
       uuid: 13.0.2
     transitivePeerDependencies:
       - '@bufbuild/protobuf'
       - '@grpc/grpc-js'
       - '@sinclair/typebox'
+      - better-sqlite3
+      - kysely
+      - mysql2
+      - pg
       - supports-color
 
-  apcore-cli@0.12.5(apcore-js@0.32.2)(apcore-toolkit@0.14.0(@sinclair/typebox@0.34.52)):
+  apcore-cli@0.12.7(apcore-js@0.32.3)(apcore-toolkit@0.14.1(@sinclair/typebox@0.34.52)):
     dependencies:
       '@sinclair/typebox': 0.34.52
-      apcore-js: 0.32.2
-      apcore-toolkit: 0.14.0(@sinclair/typebox@0.34.52)
+      apcore-js: 0.32.3
+      apcore-toolkit: 0.14.1(@sinclair/typebox@0.34.52)
       commander: 12.1.0
       js-yaml: 4.3.1
     optionalDependencies:
       keytar: 7.9.0
 
-  apcore-js@0.32.2:
+  apcore-js@0.32.3:
     dependencies:
       '@sinclair/typebox': 0.34.52
       js-yaml: 4.3.1
       uuid: 11.1.1
 
-  apcore-mcp@0.23.1(@sinclair/typebox@0.34.52)(zod@4.4.3):
+  apcore-mcp@0.23.3(@sinclair/typebox@0.34.52)(zod@4.4.3):
     dependencies:
       '@modelcontextprotocol/sdk': 1.30.0(zod@4.4.3)
       ajv: 8.20.0
-      apcore-js: 0.32.2
-      apcore-toolkit: 0.14.0(@sinclair/typebox@0.34.52)
+      apcore-js: 0.32.3
+      apcore-toolkit: 0.14.1(@sinclair/typebox@0.34.52)
       jsonwebtoken: 9.0.3
       mcp-embedded-ui: 0.5.0
     transitivePeerDependencies:
@@ -1820,11 +1863,11 @@ snapshots:
       - supports-color
       - zod
 
-  apcore-toolkit@0.14.0(@sinclair/typebox@0.34.52):
+  apcore-toolkit@0.14.1(@sinclair/typebox@0.34.52):
     dependencies:
       '@sinclair/typebox': 0.34.52
       ajv: 8.20.0
-      apcore-js: 0.32.2
+      apcore-js: 0.32.3
       js-yaml: 4.3.1
 
   apdev-js@0.2.4(typescript@5.9.3):
@@ -1866,6 +1909,20 @@ snapshots:
       iconv-lite: 0.7.3
       on-finished: 2.4.1
       qs: 6.15.3
+      raw-body: 3.0.2
+      type-is: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
+
+  body-parser@2.4.0:
+    dependencies:
+      bytes: 3.1.2
+      content-type: 2.1.0
+      debug: 4.4.3
+      http-errors: 2.0.1
+      iconv-lite: 0.7.3
+      on-finished: 2.4.2
+      qs: 6.16.1
       raw-body: 3.0.2
       type-is: 2.1.0
     transitivePeerDependencies:
@@ -1925,6 +1982,8 @@ snapshots:
   commander@13.1.0: {}
 
   content-disposition@1.1.0: {}
+
+  content-disposition@2.0.1: {}
 
   content-type@1.0.5: {}
 
@@ -2088,6 +2147,39 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  express@5.3.0:
+    dependencies:
+      accepts: 2.0.0
+      body-parser: 2.4.0
+      content-disposition: 2.0.1
+      content-type: 2.1.0
+      cookie: 0.7.2
+      cookie-signature: 1.2.2
+      debug: 4.4.3
+      depd: 2.0.0
+      encodeurl: 2.0.0
+      escape-html: 1.0.3
+      etag: 1.8.1
+      finalhandler: 2.1.1
+      fresh: 2.0.0
+      http-errors: 2.0.1
+      merge-descriptors: 2.0.0
+      mime-types: 3.0.2
+      on-finished: 2.4.2
+      once: 1.4.0
+      parseurl: 1.3.3
+      proxy-addr: 2.0.8
+      qs: 6.16.1
+      range-parser: 1.3.0
+      router: 2.2.0
+      send: 1.2.1
+      serve-static: 2.2.1
+      statuses: 2.0.2
+      type-is: 2.1.0
+      vary: 1.1.2
+    transitivePeerDependencies:
+      - supports-color
+
   fast-deep-equal@3.1.3: {}
 
   fast-uri@3.1.6: {}
@@ -2227,6 +2319,8 @@ snapshots:
 
   jose@6.2.10: {}
 
+  jose@6.2.13: {}
+
   js-tokens@10.0.0: {}
 
   js-tokens@9.0.1: {}
@@ -2348,7 +2442,7 @@ snapshots:
     dependencies:
       content-type: 2.1.0
 
-  node-abi@3.95.0:
+  node-abi@3.101.0:
     dependencies:
       semver: 7.8.5
     optional: true
@@ -2361,6 +2455,10 @@ snapshots:
   object-inspect@1.13.4: {}
 
   on-finished@2.4.1:
+    dependencies:
+      ee-first: 1.1.1
+
+  on-finished@2.4.2:
     dependencies:
       ee-first: 1.1.1
 
@@ -2405,7 +2503,7 @@ snapshots:
       minimist: 1.2.8
       mkdirp-classic: 0.5.3
       napi-build-utils: 2.0.0
-      node-abi: 3.95.0
+      node-abi: 3.101.0
       pump: 3.0.4
       rc: 1.2.8
       simple-get: 4.0.1
@@ -2418,6 +2516,11 @@ snapshots:
       forwarded: 0.2.0
       ipaddr.js: 1.9.1
 
+  proxy-addr@2.0.8:
+    dependencies:
+      forwarded: 0.2.0
+      ipaddr.js: 1.9.1
+
   pump@3.0.4:
     dependencies:
       end-of-stream: 1.4.5
@@ -2425,6 +2528,11 @@ snapshots:
     optional: true
 
   qs@6.15.3:
+    dependencies:
+      es-define-property: 1.0.1
+      side-channel: 1.1.1
+
+  qs@6.16.1:
     dependencies:
       es-define-property: 1.0.1
       side-channel: 1.1.1

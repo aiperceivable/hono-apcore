@@ -1,9 +1,90 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { CancelToken, Context } from 'apcore-js';
 import { Hono } from 'hono';
 import { HonoRouteScanner, buildRequestUrl } from '../../src/scanners/hono-route-scanner.js';
 import { HonoContextFactory } from '../../src/context/hono-context.factory.js';
 
 const scanner = new HonoRouteScanner();
+
+describe('HonoRouteScanner cancellation', () => {
+  it('decodes streamed UTF-8 JSON and releases the completed response reader', async () => {
+    const bytes = new TextEncoder().encode('{"value":"你好"}');
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        for (const byte of bytes) controller.enqueue(Uint8Array.of(byte));
+        controller.close();
+      },
+    });
+    const app = new Hono().get('/utf8', () => new Response(body, {
+      headers: { 'content-type': 'application/json' },
+    }));
+    await expect(scanner.scanWithExecutors(app)[0].execute({}, Context.create()))
+      .resolves.toEqual({ value: '你好' });
+    expect(body.locked).toBe(false);
+  });
+
+  it('preserves response read failures and releases the errored reader', async () => {
+    const error = new Error('response producer failed');
+    const body = new ReadableStream({ start(controller) { controller.error(error); } });
+    const app = new Hono().get('/failed', () => new Response(body));
+    await expect(scanner.scanWithExecutors(app)[0].execute({}, Context.create())).rejects.toBe(error);
+    expect(body.locked).toBe(false);
+  });
+
+  it('forwards live cancellation to the replayed Hono request', async () => {
+    const token = new CancelToken();
+    let signal: AbortSignal | undefined;
+    const app = new Hono();
+    app.get('/signal', (c) => {
+      signal = c.req.raw.signal;
+      return c.json({ ok: true });
+    });
+    await scanner.scanWithExecutors(app)[0].execute({}, Context.create(null, null, token));
+    token.cancel();
+    expect(signal?.aborted).toBe(true);
+  });
+
+  it('does not replay a route for a pre-cancelled context', async () => {
+    const token = new CancelToken();
+    token.cancel();
+    const handler = vi.fn((c: import('hono').Context) => c.json({ ok: true }));
+    const app = new Hono().get('/cancelled', handler);
+    await expect(scanner.scanWithExecutors(app)[0].execute({}, Context.create(null, null, token)))
+      .rejects.toMatchObject({ code: 'EXECUTION_CANCELLED' });
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['application/json', 200],
+    ['text/plain', 200],
+    ['application/json', 500],
+  ])('cancels an unfinished %s response body (status %i)', async (contentType, status) => {
+    const token = new CancelToken();
+    let controller!: ReadableStreamDefaultController<Uint8Array>;
+    const cancel = vi.fn();
+    const body = new ReadableStream<Uint8Array>({
+      start(value) { controller = value; value.enqueue(new TextEncoder().encode('{')); },
+      cancel,
+    });
+    const app = new Hono().get('/body', () => new Response(body, {
+      status, headers: { 'content-type': contentType },
+    }));
+    const execution = Promise.resolve(scanner.scanWithExecutors(app)[0]
+      .execute({}, Context.create(null, null, token)));
+    // Attach rejection handling before cancellation, including on the old implementation.
+    const outcome = execution.catch((error: unknown) => error);
+    try {
+      await vi.waitFor(() => expect(body.locked).toBe(true));
+      token.cancel();
+      await vi.waitFor(() => expect(cancel).toHaveBeenCalledOnce(), { timeout: 200 });
+      expect(await outcome).toMatchObject({ code: 'EXECUTION_CANCELLED' });
+      expect(body.locked).toBe(false);
+    } finally {
+      if (cancel.mock.calls.length === 0) controller.close();
+      await outcome;
+    }
+  });
+});
 
 function buildApp(): Hono {
   const app = new Hono();

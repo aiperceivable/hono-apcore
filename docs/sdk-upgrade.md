@@ -7,14 +7,45 @@ unchanged; these changes are recorded under Unreleased.
 
 | Package | Previously locked | Upgraded |
 | --- | --- | --- |
-| apcore-js | 0.27.0 | 0.32.2 |
-| apcore-toolkit | 0.10.1 | 0.14.0 |
-| apcore-mcp | 0.18.1 | 0.23.1 |
-| apcore-cli | 0.10.5 | 0.12.5 |
-| apcore-a2a | 0.5.0 | 0.8.3 |
+| apcore-js | 0.32.2 | 0.32.3 |
+| apcore-toolkit | 0.14.0 | 0.14.1 |
+| apcore-mcp | 0.23.1 | 0.23.3 |
+| apcore-cli | 0.12.5 | 0.12.7 |
+| apcore-a2a | 0.8.3 | 0.8.5 |
 
 All five SDKs require Node.js 20+. The adapter's engine requirement now matches;
 CI already uses Node.js 20. Optional surface packages remain lazily imported.
+
+## Patch upgrade assessment (2026-10-26)
+
+The five published packages retain the interfaces used by the adapter. CLI
+`createCli`/`GroupedModuleGroup`, MCP `serve`/`asyncServe`, A2A
+`serve`/`asyncServe`, and toolkit binding/scanner APIs require no signature or
+option changes. The existing CLI executor bridge and lazy surface loading stay
+in place. Real CLI integration tests, embedded MCP requests, and A2A HTTP skill
+discovery and execution exercise these boundaries with the upgraded packages.
+
+One adapter change is necessary to carry SDK cancellation through Hono route
+replay. The scanner now passes `Context.signal` into `app.request()` and rejects
+an already-aborted context before invoking a route. Since `app.request()` runs
+in process, it does not provide native fetch's automatic response-body abort:
+the adapter explicitly cancels the owned response reader, releases its lock,
+and awaits asynchronous stream cancellation cleanup. This applies to JSON, text
+and error responses, and includes cancellation before response headers arrive.
+
+Core 0.32.3's `CancelToken.drain()` tracks module bodies after prompt cancellation.
+The adapter keeps route and response-producer cleanup within that body, allowing
+the lifecycle owner to await it. Handlers must cooperate with
+`c.req.raw.signal`; arbitrary route code that ignores cancellation can still keep
+drain pending. Do not call a token's drain from inside its own module execution.
+
+Toolkit 0.14.1's HTTP proxy cancellation, full-response deadlines, authentication
+and OpenAPI timeout fixes are inherited where those SDK APIs are used. They do
+not automatically fix Hono's separate in-process replay path, which is why the
+scanner adaptation above is required. No duplicate toolkit implementation is added.
+
+The following sections also retain the broader integration decisions introduced
+in hono-apcore 0.2.0.
 
 ## Required adapter changes
 
@@ -153,14 +184,17 @@ Regression tests exercise native SDK behavior through the Hono integration:
 - Live policy clearing/replacement during named traces; display projection parity
   with the SDK and real child-process JSON/stdin-stdout protocol checks.
 
-## Upstream limitation
+## MCP stdio isolation
 
-`apcore-mcp` 0.23.1's high-level `serve()` itself writes a startup INFO line to
-stdout through a captured logger, even when its log level is ERROR. This is
-independent of display registration and remains an upstream issue. The stdio
-registration regression uses the SDK's public factory and transport APIs to
-isolate registration output from that startup logger; it does not certify
-`serve()` as completely free of non-protocol stdout.
+The former 0.23.1 startup-logger limitation is fixed upstream in 0.23.3. Hono
+continues to use the SDK's high-level `serve()` directly, inheriting its stdio
+output lease and execution cleanup draining. A real child-process regression
+launches `hono-apcore serve --transport stdio`, initializes an MCP client, lists
+and calls a tool, and closes the session. Startup/shutdown hooks, module console
+logs and direct `process.stdout.write()` diagnostics arrive on stderr without
+protocol parse errors. A separate low-level transport test still covers quiet
+display registration. Output produced by application imports before `serve()`
+acquires stdio is outside that SDK session's isolation boundary.
 
 Source references:
 [core changelog](https://github.com/aiperceivable/apcore-typescript/blob/main/CHANGELOG.md),

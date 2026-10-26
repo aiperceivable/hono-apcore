@@ -5,10 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] - 2026-10-25
+
+## [0.2.0] - 2026-10-26
 
 ### Changed
 
+- Raise SDK floors to apcore-js 0.32.3, apcore-toolkit 0.14.1,
+  apcore-mcp 0.23.3, apcore-cli 0.12.7 and apcore-a2a 0.8.5.
+  Refresh root and demo lockfiles and document the published SDK assessment.
+- Inherit MCP stdio diagnostic isolation and execution draining, and toolkit
+  HTTP proxy cancellation and full-response timeout fixes.
 - Raise SDK floors to apcore-js 0.32.2, apcore-toolkit 0.14.0,
   apcore-mcp 0.23.1, apcore-cli 0.12.5 and apcore-a2a 0.8.3.
   Refresh both lockfiles and the demo; require Node.js 20+.
@@ -27,6 +33,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Forward execution cancellation to replayed Hono requests and reject
+  pre-cancelled calls before invoking routes. Cancel unfinished response bodies
+  and await their asynchronous cleanup so core `CancelToken.drain()` can finish
+  only after owned route work settles.
 - Preserve camelCase runtime annotations, including approval, open-world and
   cache settings; convert to snake_case only at YAML and CLI boundaries.
 - Wire CLI commands to registered Hono modules and the host executor. Adapt

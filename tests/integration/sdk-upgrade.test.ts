@@ -2,9 +2,15 @@ import { describe, expect, it, vi } from 'vitest';
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { createServer } from 'node:http';
+import type { RequestListener } from 'node:http';
+import type { AddressInfo } from 'node:net';
+import { once } from 'node:events';
 import {
   AlwaysDenyHandler,
+  CancelToken,
   Config,
+  Context,
   ExecutionPolicy,
   Registry,
 } from 'apcore-js';
@@ -13,8 +19,99 @@ import { createApcore } from '../../src/core/apcore.js';
 import { ApcoreRegistry } from '../../src/core/registry.js';
 import { ApBindingLoader } from '../../src/bridge/binding-loader.js';
 import { renderBindingsYaml } from '../../src/output/yaml-writer.js';
+import { Hono } from 'hono';
 
 describe('SDK upgrade integration', () => {
+  it('discovers and executes a registered tool through the real A2A HTTP app', async () => {
+    const ap = createApcore({
+      tools: [{ id: 'demo.echo', description: 'Echo', handler: (inputs) => ({ echoed: inputs }) }],
+      a2a: { name: 'hono-upgrade', sysModules: false, metrics: false },
+    });
+    await ap.init();
+    const app = await ap.a2a!.asyncServe();
+    const server = createServer(app as RequestListener);
+    try {
+      server.listen(0, '127.0.0.1');
+      await once(server, 'listening');
+      const url = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+      const card = await fetch(`${url}/.well-known/agent-card.json`);
+      expect(await card.json()).toMatchObject({ name: 'hono-upgrade', skills: [{ id: 'demo.echo' }] });
+      const response = await fetch(url, {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        signal: AbortSignal.timeout(3_000),
+        body: JSON.stringify({
+          jsonrpc: '2.0', id: 'upgrade', method: 'message/send',
+          params: { message: {
+            messageId: 'upgrade-message', role: 'user',
+            parts: [{ kind: 'text', text: '{"value":42}' }],
+            metadata: { skillId: 'demo.echo' },
+          } },
+        }),
+      });
+      expect(response.status).toBe(200);
+      expect(await response.json()).toMatchObject({ result: {
+        status: { state: 'completed' },
+        artifacts: [{ parts: [{ kind: 'data', data: { echoed: { value: 42 } } }] }],
+      } });
+    } finally {
+      server.closeAllConnections();
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+      await ap.close();
+    }
+  });
+
+  it.each(['handler', 'body'])('drains asynchronous route %s cleanup after cancellation', async (phase) => {
+    const token = new CancelToken();
+    let started!: () => void;
+    const ready = new Promise<void>((resolve) => { started = resolve; });
+    let release!: () => void;
+    const cleanupGate = new Promise<void>((resolve) => { release = resolve; });
+    let wakeHandler = (): void => {};
+    let cleaned = false;
+    const app = new Hono().get('/drain', async (c) => {
+      if (phase === 'body') {
+        return new Response(new ReadableStream({
+          start(controller) { controller.enqueue(new TextEncoder().encode('{')); started(); },
+          async cancel() { await cleanupGate; cleaned = true; },
+        }), { headers: { 'content-type': 'application/json' } });
+      }
+      const aborted = new Promise<void>((resolve) => {
+        wakeHandler = resolve;
+        c.req.raw.signal.addEventListener('abort', resolve.bind(null, undefined), { once: true });
+        if (c.req.raw.signal.aborted) resolve();
+      });
+      started();
+      await aborted;
+      await cleanupGate;
+      cleaned = true;
+      return c.json({ ok: true });
+    });
+    const ap = createApcore();
+    await ap.init(app);
+    const execution = ap.executor.call('drain.list', {}, Context.create(null, null, token))
+      .catch((error: unknown) => error);
+    try {
+      await ready;
+      token.cancel();
+      expect(await execution).toMatchObject({ code: 'EXECUTION_CANCELLED' });
+      let drained = false;
+      const draining = token.drain().then(() => { drained = true; });
+      await new Promise<void>((resolve) => setImmediate(resolve));
+      expect(drained).toBe(false);
+      expect(cleaned).toBe(false);
+      release();
+      await draining;
+      expect(cleaned).toBe(true);
+    } finally {
+      token.cancel();
+      wakeHandler();
+      release();
+      await execution;
+      await token.drain();
+      await ap.close();
+    }
+  });
+
   it('preserves runtime annotations and enforces tool approval', async () => {
     const handler = vi.fn(() => ({ ok: true }));
     const ap = createApcore({

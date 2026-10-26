@@ -36,8 +36,8 @@ npm install zod                                    # Zod schemas
 ```
 
 **Requirements:** Node.js >= 20, Hono >= 4 (tested with Hono 4.13).
-SDK minimums: apcore-js 0.32.2, apcore-toolkit 0.14.0; optional peers
-apcore-mcp 0.23.1, apcore-cli 0.12.5, and apcore-a2a 0.8.3.
+SDK minimums: apcore-js 0.32.3, apcore-toolkit 0.14.1; optional peers
+apcore-mcp 0.23.3, apcore-cli 0.12.7, and apcore-a2a 0.8.5.
 See [SDK upgrade notes](./docs/sdk-upgrade.md) for compatibility changes and new options.
 
 ## Quick start

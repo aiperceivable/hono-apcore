@@ -1,4 +1,4 @@
-import { ModuleExecuteError, TraceContext, matchPattern } from 'apcore-js';
+import { ExecutionCancelledError, ModuleExecuteError, TraceContext, matchPattern } from 'apcore-js';
 import type { Context as ApcoreContext } from 'apcore-js';
 import {
   BaseScanner,
@@ -106,11 +106,54 @@ function contextHeaders(context: unknown): Record<string, string> {
   return headers;
 }
 
+function checkCancellation(signal?: AbortSignal): void {
+  if (signal?.aborted) throw new ExecutionCancelledError();
+}
+
+/** In-process responses need explicit cancellation; app.request() is not fetch(). */
+async function readResponseText(response: Response, signal?: AbortSignal): Promise<string> {
+  if (!signal) return response.text();
+  const reader = response.body?.getReader();
+  if (!reader) {
+    checkCancellation(signal);
+    return '';
+  }
+
+  let cancellation: Promise<void> | undefined;
+  const onAbort = (): void => {
+    // Keep asynchronous stream finalizers owned by this execution so SDK drain()
+    // cannot finish while the response producer is still cleaning up.
+    cancellation = reader.cancel(signal.reason).catch(() => {});
+  };
+  signal.addEventListener('abort', onAbort, { once: true });
+  if (signal.aborted) onAbort();
+
+  try {
+    const decoder = new TextDecoder();
+    let text = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      checkCancellation(signal);
+      if (done) return text + decoder.decode();
+      text += decoder.decode(value, { stream: true });
+    }
+  } finally {
+    signal.removeEventListener('abort', onAbort);
+    await cancellation;
+    reader.releaseLock();
+  }
+}
+
 /** Turn a Response into the plain object a module must return. */
-async function responseToResult(response: Response, moduleId: string): Promise<Record<string, unknown>> {
+async function responseToResult(
+  response: Response,
+  moduleId: string,
+  signal?: AbortSignal,
+): Promise<Record<string, unknown>> {
   const contentType = response.headers.get('content-type') ?? '';
   const isJson = contentType.includes('json');
-  const payload: unknown = isJson ? await response.json() : await response.text();
+  const text = await readResponseText(response, signal);
+  const payload: unknown = isJson ? JSON.parse(text) : text;
 
   if (!response.ok) {
     const detail =
@@ -256,17 +299,19 @@ export class HonoRouteScanner extends BaseScanner {
     });
 
     const execute: BoundExecuteFn = async (inputs, context) => {
+      const signal = (context as ApcoreContext | null | undefined)?.signal;
+      checkCancellation(signal);
       const url = buildRequestUrl(path, method, inputs, config.baseUrl);
       const headers: Record<string, string> = contextHeaders(context);
 
-      const init: RequestInit = { method, headers };
+      const init: RequestInit = { method, headers, signal };
       if (BODY_METHODS.has(method)) {
         headers['content-type'] = 'application/json';
         init.body = JSON.stringify(inputs['body'] ?? {});
       }
 
       const response = await app.request(url, init);
-      return responseToResult(response, moduleId);
+      return responseToResult(response, moduleId, signal);
     };
 
     return { module, execute };
