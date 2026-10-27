@@ -8,7 +8,7 @@ const scanner = new HonoRouteScanner();
 
 describe('HonoRouteScanner cancellation', () => {
   it('decodes streamed UTF-8 JSON and releases the completed response reader', async () => {
-    const bytes = new TextEncoder().encode('{"value":"你好"}');
+    const bytes = new TextEncoder().encode('{"value":"\u4f60\u597d"}');
     const body = new ReadableStream<Uint8Array>({
       start(controller) {
         for (const byte of bytes) controller.enqueue(Uint8Array.of(byte));
@@ -19,7 +19,7 @@ describe('HonoRouteScanner cancellation', () => {
       headers: { 'content-type': 'application/json' },
     }));
     await expect(scanner.scanWithExecutors(app)[0].execute({}, Context.create()))
-      .resolves.toEqual({ value: '你好' });
+      .resolves.toEqual({ value: '\u4f60\u597d' });
     expect(body.locked).toBe(false);
   });
 
