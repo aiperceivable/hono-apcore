@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+
 ## [0.3.0] - 2026-11-02
 
 ### Added
@@ -30,6 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `apcore()` convenience overload now accepts core options only. Pass a
   configured `HonoApcore` instance when MCP, CLI, A2A, or disk bindings are
   needed.
+- Raise the optional apcore-mcp peer floor and development/demo dependency to
+  0.23.4, inheriting tool-error results, unknown-tool protocol errors and safer
+  output redaction and execution logs. Refresh root and demo lockfiles.
 
 ---
 

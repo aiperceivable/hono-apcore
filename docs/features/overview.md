@@ -109,7 +109,7 @@ registering twice — and `ready()` awaits an in-flight one. With
 
 ## SDK compatibility
 
-The current integration targets apcore-js 0.32.3, toolkit 0.14.1, MCP 0.23.3,
+The current integration targets apcore-js 0.32.3, toolkit 0.14.1, MCP 0.23.4,
 CLI 0.12.7 and A2A 0.8.5 on Node.js 20+. See the
 [upgrade assessment](../sdk-upgrade.md) for behavior changes, migration rules,
 and the division between upstream behavior and Hono adapter responsibilities.

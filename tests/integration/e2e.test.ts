@@ -5,7 +5,7 @@ import { serve } from '@hono/node-server';
 import type { ServerType } from '@hono/node-server';
 import { Type } from '@sinclair/typebox';
 import { Value } from '@sinclair/typebox/value';
-import { jsonSchemaToTypeBox } from 'apcore-js';
+import { jsonSchemaToTypeBox, ModuleError } from 'apcore-js';
 import { createApcore, defineTool } from '../../src/index.js';
 import type { HonoApcore } from '../../src/index.js';
 import type { McpApp } from '../../src/index.js';
@@ -52,6 +52,10 @@ beforeAll(async () => {
 
   ap = createApcore({
     tools: [
+      defineTool({
+        id: 'errors.fail', description: 'Return a controlled tool failure',
+        handler: () => { throw new ModuleError('GENERAL_INVALID_INPUT', 'Synthetic invalid input'); },
+      }),
       defineTool({
         namespace: 'math',
         name: 'add',
@@ -123,7 +127,7 @@ afterAll(async () => {
 describe('hono-apcore end to end', () => {
   it('registers both the tools and the scanned routes', () => {
     expect(ap.registry.list().sort()).toEqual([
-      'contract.echo', 'math.add', 'privacy.redact', 'todos.get', 'todos.list',
+      'contract.echo', 'errors.fail', 'math.add', 'privacy.redact', 'todos.get', 'todos.list',
     ]);
   });
 
@@ -159,6 +163,34 @@ describe('hono-apcore end to end', () => {
     const result = await rpc('tools/call', { name: 'contract.echo', arguments: args });
     const content = (result.result as { content: { text: string }[] }).content;
     expect(JSON.parse(content[0].text)).toEqual(args);
+  });
+
+  it('preserves controlled tool failures as results over the mounted MCP endpoint', async () => {
+    const response = await rpc('tools/call', { name: 'errors.fail', arguments: {} });
+    expect(response.error).toBeUndefined();
+    expect(response.result).toMatchObject({
+      isError: true,
+      content: [{ type: 'text', text: expect.stringContaining('Synthetic invalid input') }],
+    });
+  });
+
+  it('returns a protocol error for unknown tools', async () => {
+    const response = await rpc('tools/call', { name: 'missing.tool', arguments: {} });
+    expect(response.result).toBeUndefined();
+    expect(response.error).toMatchObject({ code: -32602 });
+  });
+
+  it('redacts default sensitive keys when a tool omits its output schema', async () => {
+    const response = await rpc('tools/call', {
+      name: 'contract.echo',
+      arguments: { nullable: null, payload: { password: 'SYNTHETIC_PASSWORD', sessionId: 'SYNTHETIC_SESSION' } },
+    });
+    expect(response.error).toBeUndefined();
+    const result = response.result as { content: { text: string }[]; structuredContent: unknown };
+    const output = JSON.parse(result.content[0].text);
+    expect(output).toEqual({ nullable: null, payload: { password: '***REDACTED***', sessionId: '***REDACTED***' } });
+    expect(result.structuredContent).toEqual(output);
+    expect(JSON.stringify(response)).not.toContain('SYNTHETIC_');
   });
 
   it('returns structured content derived from redacted text, including local references', async () => {

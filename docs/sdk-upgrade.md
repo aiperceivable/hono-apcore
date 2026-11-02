@@ -9,12 +9,35 @@ unchanged; these changes are recorded under Unreleased.
 | --- | --- | --- |
 | apcore-js | 0.32.2 | 0.32.3 |
 | apcore-toolkit | 0.14.0 | 0.14.1 |
-| apcore-mcp | 0.23.1 | 0.23.3 |
+| apcore-mcp | 0.23.1 | 0.23.4 |
 | apcore-cli | 0.12.5 | 0.12.7 |
 | apcore-a2a | 0.8.3 | 0.8.5 |
 
 All five SDKs require Node.js 20+. The adapter's engine requirement now matches;
 CI already uses Node.js 20. Optional surface packages remain lazily imported.
+
+## MCP 0.23.4 assessment (2026-11-02)
+
+Raise the optional MCP peer floor to 0.23.4 and update the root and demo
+lockfiles to the published npm release. The `serve()` / `asyncServe()` APIs
+and forwarded options retain their existing signatures, so the Hono service
+and mounting implementation require no changes.
+
+Known-tool execution failures now arrive as successful JSON-RPC responses
+with `result.isError: true`. Unknown tool names are rejected before execution
+with protocol error `-32602`. Consumers should distinguish these two paths.
+The HTTP integration tests exercise both through `mountMcp()`.
+
+Output redaction still precedes formatting. Default sensitive-key rules apply
+when no output schema is provided; Hono already supplies a default object
+schema for such tools. Redaction failures withhold output, and upstream
+execution logs omit raw exception objects. The mounted-endpoint tests cover
+default-key and schema-reference redaction in text and structured results.
+
+Applications returning content digests must hash the delivered representation.
+For plain-object JSON results, the existing `mcp.outputFormatter` can compute a
+digest after redaction. It does not receive tool/redaction metadata, is bypassed
+by CSV/JSONL formats, and falls back to JSON serialization if it throws.
 
 ## Patch upgrade assessment (2026-10-26)
 
