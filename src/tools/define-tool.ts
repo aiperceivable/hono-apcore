@@ -1,5 +1,5 @@
-import { createScannedModule, enrichSchemaDescriptions } from 'apcore-toolkit';
-import type { ScannedModule } from 'apcore-toolkit';
+import { createScannedModule, enrichSchemaDescriptions } from 'apcore-toolkit/browser';
+import type { ScannedModule } from 'apcore-toolkit/browser';
 import { SchemaExtractor, defaultSchemaExtractor } from '../schema/schema-extractor.js';
 import { generateModuleId, normalizeMethodName, applyModulePrefix } from '../utils/id-generator.js';
 import {

@@ -1,8 +1,6 @@
-import { mkdir, writeFile } from 'node:fs/promises';
-import { dirname } from 'node:path';
 import * as yaml from 'js-yaml';
-import { annotationsToDict } from 'apcore-toolkit';
-import type { ScannedModule } from 'apcore-toolkit';
+import { annotationsToDict } from 'apcore-toolkit/browser';
+import type { ScannedModule } from 'apcore-toolkit/browser';
 
 /** One entry of the `bindings:` list in a bindings YAML file. */
 export interface BindingRecord {
@@ -77,6 +75,10 @@ export async function writeBindingsFile(
   modules: ScannedModule[],
   filePath: string,
 ): Promise<string> {
+  const [{ mkdir, writeFile }, { dirname }] = await Promise.all([
+    import('node:fs/promises'),
+    import('node:path'),
+  ]);
   await mkdir(dirname(filePath), { recursive: true });
   await writeFile(filePath, renderBindingsYaml(modules), 'utf-8');
   return filePath;

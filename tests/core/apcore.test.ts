@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Hono } from 'hono';
 import { ACL, ACLDeniedError } from 'apcore-js';
-import { HonoApcore, createApcore } from '../../src/core/apcore.js';
+import { HonoApcore, createApcore } from '../../src/core/apcore.node.js';
 import { defineTool } from '../../src/tools/define-tool.js';
 
 const serve = vi.fn(async (..._args: unknown[]) => undefined);

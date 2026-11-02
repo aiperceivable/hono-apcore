@@ -3,7 +3,7 @@ import { PassThrough } from 'node:stream';
 import { setAuditLogger } from 'apcore-cli';
 import { ACL, AfterMiddleware, AlwaysDenyHandler, DEFAULT_ANNOTATIONS, STREAMING_MARKER } from 'apcore-js';
 import type { createCli } from 'apcore-cli';
-import { createApcore } from '../../src/core/apcore.js';
+import { createApcore } from '../../src/core/apcore.node.js';
 
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllEnvs(); });
 

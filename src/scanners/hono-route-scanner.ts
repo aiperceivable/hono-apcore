@@ -6,8 +6,8 @@ import {
   extractPathParamNames,
   generateSuggestedAlias,
   substitutePathParams,
-} from 'apcore-toolkit';
-import type { ScannedModule } from 'apcore-toolkit';
+} from 'apcore-toolkit/browser';
+import type { ScannedModule } from 'apcore-toolkit/browser';
 import { defaultSchemaExtractor } from '../schema/schema-extractor.js';
 import { applyModulePrefix } from '../utils/id-generator.js';
 import { normalizeResult, toModuleAnnotations } from '../utils/module-factory.js';

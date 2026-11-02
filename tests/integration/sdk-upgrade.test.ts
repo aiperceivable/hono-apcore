@@ -15,7 +15,7 @@ import {
   Registry,
 } from 'apcore-js';
 import { createScannedModule } from 'apcore-toolkit';
-import { createApcore } from '../../src/core/apcore.js';
+import { createApcore } from '../../src/core/apcore.node.js';
 import { ApcoreRegistry } from '../../src/core/registry.js';
 import { ApBindingLoader } from '../../src/bridge/binding-loader.js';
 import { renderBindingsYaml } from '../../src/output/yaml-writer.js';

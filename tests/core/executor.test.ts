@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { AlwaysDenyHandler, ExecutionPolicy, Executor, PolicyRule, Registry } from 'apcore-js';
-import { createApcore } from '../../src/core/apcore.js';
+import { createApcore } from '../../src/core/apcore.node.js';
 import { ApcoreExecutor } from '../../src/core/executor.js';
 import { ApcoreRegistry } from '../../src/core/registry.js';
 

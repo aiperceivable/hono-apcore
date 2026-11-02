@@ -3,7 +3,7 @@ import type { Context as ApcoreContext } from 'apcore-js';
 import { APCORE_CONTEXT_VAR, APCORE_VAR } from '../constants.js';
 import { HonoContextFactory } from '../context/hono-context.factory.js';
 import type { HonoApcore } from './apcore.js';
-import type { HonoApcoreOptions } from '../types.js';
+import type { HonoApcoreCoreOptions } from '../types.js';
 
 declare module 'hono' {
   interface ContextVariableMap {
@@ -53,10 +53,10 @@ export function apcore(
   options?: ApcoreMiddlewareOptions,
 ): MiddlewareHandler;
 export function apcore(
-  options?: HonoApcoreOptions & ApcoreMiddlewareOptions,
+  options?: HonoApcoreCoreOptions & ApcoreMiddlewareOptions,
 ): MiddlewareHandler;
 export function apcore(
-  instanceOrOptions?: HonoApcore | (HonoApcoreOptions & ApcoreMiddlewareOptions),
+  instanceOrOptions?: HonoApcore | (HonoApcoreCoreOptions & ApcoreMiddlewareOptions),
   maybeOptions?: ApcoreMiddlewareOptions,
 ): MiddlewareHandler {
   // Resolved lazily so this module never imports the class eagerly — that
@@ -67,7 +67,7 @@ export function apcore(
 
   const instance = isInstance ? (instanceOrOptions as HonoApcore) : undefined;
   const options = (isInstance ? maybeOptions : instanceOrOptions) as
-    | (HonoApcoreOptions & ApcoreMiddlewareOptions)
+    | (HonoApcoreCoreOptions & ApcoreMiddlewareOptions)
     | undefined;
 
   let resolved: HonoApcore | undefined = instance;

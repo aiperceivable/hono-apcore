@@ -38,5 +38,8 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Check edge bundle
+        run: pnpm check:edge
+
       - name: Run tests
         run: pnpm test

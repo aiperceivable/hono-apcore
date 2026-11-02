@@ -1,6 +1,6 @@
 import type { ModuleDescriptor, Registry } from 'apcore-js';
-import { createScannedModule, moduleToDict, modulesToDicts } from 'apcore-toolkit';
-import type { ScannedModule } from 'apcore-toolkit';
+import { createScannedModule, moduleToDict, modulesToDicts } from 'apcore-toolkit/browser';
+import type { ScannedModule } from 'apcore-toolkit/browser';
 import type {
   ApToolDefinition,
   RegisterMethodOptions,

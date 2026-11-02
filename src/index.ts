@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // Core
 // ---------------------------------------------------------------------------
-export { HonoApcore, createApcore } from './core/apcore.js';
+export { HonoApcore, createApcore } from './core/apcore.node.js';
 export { ApcoreRegistry } from './core/registry.js';
 export { ApcoreExecutor } from './core/executor.js';
 export { apcore, getApcore, getApcoreContext } from './core/middleware.js';
@@ -138,13 +138,9 @@ export {
   BaseScanner,
   createScannedModule,
   cloneModule,
-  filterModules,
-  deduplicateIds,
   moduleToDict,
   modulesToDicts,
   annotationsToDict,
-  formatModule,
-  formatModules,
   toMarkdown,
   enrichSchemaDescriptions,
   resolveHttpVerb,
@@ -153,8 +149,18 @@ export {
   extractPathParamNames,
   substitutePathParams,
   SCANNER_VERB_MAP,
+} from 'apcore-toolkit/browser';
+export type { ScannedModule } from 'apcore-toolkit/browser';
+
+// The full toolkit entry adds four pure helpers that the browser subset does
+// not expose yet. They stay in the Node entry so the edge entry never loads
+// the toolkit's Node-only root module.
+export {
+  filterModules,
+  deduplicateIds,
+  formatModule,
+  formatModules,
 } from 'apcore-toolkit';
-export type { ScannedModule } from 'apcore-toolkit';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -180,6 +186,7 @@ export type {
   ApToolDefinition,
   ApToolsetOptions,
   // Configuration
+  HonoApcoreCoreOptions,
   HonoApcoreOptions,
   ApcoreMcpOptions,
   ApcoreCliOptions,

@@ -1,6 +1,6 @@
 import { CallbackApprovalHandler, Context as ApcoreContext, createApprovalResult, Executor } from 'apcore-js';
 import type { ApprovalResult, Context } from 'apcore-js';
-import { annotationsToDict } from 'apcore-toolkit';
+import { annotationsToDict } from 'apcore-toolkit/browser';
 import type { CreateCliOptions } from 'apcore-cli';
 import { ApcoreExecutor } from '../core/executor.js';
 import type { ApcoreRegistry } from '../core/registry.js';

@@ -65,8 +65,12 @@ surfaces are read-only consumers of what is registered.
 
 That split is deliberate. `apcore-mcp` reaches for `node:http`, so a static
 import would break a Workers, Deno, or Bun build of an app that never touches
-the MCP surface. Everything optional sits behind `await import(...)` inside a
-service method, and nothing optional is re-exported from `src/index.ts`.
+the MCP surface. The package ships two entries: the Node entry in
+`src/index.ts` keeps the optional surfaces behind `await import(...)` inside a
+service method, and the edge entry in `src/edge.ts` omits them entirely. The
+`browser`, `worker`, and `workerd` export conditions select the edge entry;
+CI bundles both entries with esbuild and fails on `node:http` or optional-peer
+leaks.
 
 ## Lifecycle
 

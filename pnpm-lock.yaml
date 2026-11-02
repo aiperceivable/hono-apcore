@@ -48,6 +48,9 @@ importers:
       apdev-js:
         specifier: ^0.2.0
         version: 0.2.4(typescript@5.9.3)
+      esbuild:
+        specifier: ^0.28.2
+        version: 0.28.2
       hono:
         specifier: ^4.13.4
         version: 4.13.4

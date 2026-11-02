@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Hono } from 'hono';
 import { createIdentity } from 'apcore-js';
-import { createApcore } from '../../src/core/apcore.js';
+import { createApcore } from '../../src/core/apcore.node.js';
 import { apcore, getApcore, getApcoreContext } from '../../src/core/middleware.js';
 import { HonoContextFactory } from '../../src/context/hono-context.factory.js';
 import { defineTool } from '../../src/tools/define-tool.js';

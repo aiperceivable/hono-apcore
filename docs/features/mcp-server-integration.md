@@ -4,9 +4,11 @@
 tools two ways: **embedded** into the Hono app, or **standalone** on its own
 port or over stdio.
 
-`apcore-mcp` is an optional peer dependency loaded lazily, so importing
-`hono-apcore` never pulls it — or `node:http` — into a build that does not use
-the MCP surface.
+`apcore-mcp` is an optional peer dependency loaded lazily by the Node entry.
+Browser, worker, and edge bundlers resolve `hono-apcore` to the core-only
+`hono-apcore/edge` entry, which does not reference `apcore-mcp` — or
+`node:http` — at all. Node consumers that do not configure the MCP surface
+never load it either.
 
 ## Embedded — one process, one port
 

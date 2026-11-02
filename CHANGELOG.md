@@ -6,6 +6,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.3.0] - 2026-11-02
+
+### Added
+
+- Add a core-only `hono-apcore/edge` entry and route the `browser`, `worker`,
+  and `workerd` export conditions to it. Edge bundles no longer reach the
+  optional MCP, CLI, or A2A peers, file-backed YAML bindings, or `node:http`.
+- Add surface subpaths: `hono-apcore/mcp`, `hono-apcore/cli`, and
+  `hono-apcore/a2a`.
+- Add an esbuild edge-bundle check (`pnpm check:edge`) to CI. It bundles both
+  `dist/edge.js` and a consumer importing `hono-apcore` with browser
+  conditions, then fails if the entry chunk imports a `node:*` builtin or any
+  chunk reaches `node:http` / `node:https` or an optional apcore peer.
+
+### Changed
+
+- Split `HonoApcore` into an edge-safe core and a Node subclass that adds the
+  MCP, CLI, A2A, and YAML-binding surfaces. The Node entry keeps the existing
+  public API; the edge entry exposes only the core.
+- Route edge-reachable toolkit imports through `apcore-toolkit/browser` and
+  load `node:fs/promises` / `node:path` lazily where file I/O is still needed.
+- The `apcore()` convenience overload now accepts core options only. Pass a
+  configured `HonoApcore` instance when MCP, CLI, A2A, or disk bindings are
+  needed.
+
+---
+
 ## [0.2.0] - 2026-10-26
 
 ### Changed

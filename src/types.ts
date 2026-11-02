@@ -101,8 +101,13 @@ export interface ApToolsetOptions {
 // HonoApcore option types
 // ---------------------------------------------------------------------------
 
-/** Options accepted by {@link createApcore} / the {@link HonoApcore} constructor. */
-export interface HonoApcoreOptions {
+/**
+ * Options accepted by the edge-safe {@link HonoApcore} core.
+ *
+ * Contains only the parts that work without Node built-ins or the optional
+ * MCP, CLI, and A2A peers.
+ */
+export interface HonoApcoreCoreOptions {
   /** SDK configuration shared by the Registry and Executor. */
   config?: Config;
   /** SDK strategy, approval, policy, toggle and event options. */
@@ -116,20 +121,24 @@ export interface HonoApcoreOptions {
   acl?: unknown | null;
   /** apcore `Middleware` instances installed on the Executor. */
   middleware?: unknown[];
-  /** Path to a YAML bindings file loaded during {@link HonoApcore.init}. */
-  bindings?: string | null;
   /** Tools registered eagerly during construction. */
   tools?: ApToolDefinition[];
+  /** Route-scanner configuration used by {@link HonoApcore.scanRoutes}. */
+  routes?: RouteScanOptions;
+  /** Overrides merged over the `APCORE_*` environment settings. */
+  settings?: Partial<import('./config.js').ApcoreSettings>;
+}
+
+/** Options accepted by the Node entry's {@link createApcore} / {@link HonoApcore}. */
+export interface HonoApcoreOptions extends HonoApcoreCoreOptions {
+  /** Path to a YAML bindings file loaded during {@link HonoApcore.init}. */
+  bindings?: string | null;
   /** MCP surface configuration. Presence enables the MCP service. */
   mcp?: ApcoreMcpOptions;
   /** CLI surface configuration. Presence enables the CLI service. */
   cli?: ApcoreCliOptions;
   /** A2A surface configuration. Presence enables the A2A service. */
   a2a?: ApcoreA2aOptions;
-  /** Route-scanner configuration used by {@link HonoApcore.scanRoutes}. */
-  routes?: RouteScanOptions;
-  /** Overrides merged over the `APCORE_*` environment settings. */
-  settings?: Partial<import('./config.js').ApcoreSettings>;
 }
 
 /** Options for the MCP surface. Mirrors `apcore-mcp`'s serve options. */

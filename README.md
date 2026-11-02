@@ -14,7 +14,7 @@ you already have.
 - **Annotation inference** — `GET` → readonly + cacheable, `PUT` → idempotent, `DELETE` → destructive (RFC 9110 safe-method semantics)
 - **Multi-schema** — TypeBox, Zod 3, Zod 4, and plain JSON Schema, auto-detected through a priority chain
 - **Context, ACL, and identity** — the `apcore()` middleware builds a per-request apcore `Context` with W3C trace propagation, so ACL rules govern your routes too
-- **Runtime-agnostic core** — `apcore-mcp`, `apcore-cli`, and `apcore-a2a` are optional peers loaded lazily, so importing `hono-apcore` never drags `node:http` into an edge build
+- **Runtime-agnostic core** — the `browser` / `worker` / `workerd` export conditions resolve to `hono-apcore/edge`, a core-only entry with no MCP, CLI, A2A, YAML file I/O, or static `node:*` imports; CI bundles it on every push
 - **CLI** — `hono-apcore scan | serve | export` works against a plain Hono app
 - **YAML bindings** — register modules declaratively, without touching source
 
@@ -395,13 +395,28 @@ environment and overridable via `settings`:
 | `APCORE_HOST` | str | `"0.0.0.0"` | Bind address when the transport is not stdio |
 | `APCORE_PORT` | int | `8808` | Bind port when the transport is not stdio |
 
-### Optional peers are not re-exported
+### Entry points and edge builds
 
-Unlike the NestJS adapter, `hono-apcore` does **not** re-export the `apcore-mcp`
-/ `apcore-cli` / `apcore-a2a` surfaces. Doing so would make them load eagerly,
-and `apcore-mcp` pulls in `node:http` — which breaks a Workers, Deno, or Bun
-build of an app that never uses the MCP surface. Import those symbols from their
-own packages:
+`hono-apcore` ships two entries:
+
+| Entry | Contents |
+| --- | --- |
+| `hono-apcore` (Node default) | Core, MCP, CLI, A2A, YAML bindings loaded from disk |
+| `hono-apcore/edge` | Core only: tools, route scanning, context, schema, ACL, config |
+
+Bundlers honouring the `browser`, `worker`, or `workerd` condition get
+`hono-apcore/edge` from the bare `hono-apcore` specifier automatically. If your
+bundler does not apply those conditions (some Deno/Bun setups), import the
+subpath explicitly:
+
+```ts
+import { createApcore, defineTool } from 'hono-apcore/edge';
+```
+
+The edge entry deliberately excludes the optional MCP, CLI, and A2A surfaces,
+file-backed YAML bindings, and the Node-only `Config` / `registerSysModules`
+re-exports. The Node entry still re-exports all of them for backward
+compatibility. Import peer symbols from their own packages:
 
 ```ts
 import { JWTAuthenticator, getCurrentIdentity } from 'apcore-mcp';
@@ -409,9 +424,17 @@ import { createCli } from 'apcore-cli';
 import { A2AClient } from 'apcore-a2a';
 ```
 
-`apcore-js` and `apcore-toolkit` *are* hard dependencies, so their common
-symbols (`ACL`, `Config`, `registerSysModules`, `TraceContext`, `BaseScanner`,
-`formatModules`, …) re-export from `hono-apcore` directly.
+Surface subpaths are also available: `hono-apcore/mcp`, `hono-apcore/cli`, and
+`hono-apcore/a2a`.
+
+CI bundles both `dist/edge.js` and a consumer importing `hono-apcore` with
+browser conditions, and fails if the entry chunk or any lazy chunk reaches
+`node:http` / `node:https` or an optional apcore peer.
+
+The edge entry's own chunk has no `node:*` imports. `apcore-js` still emits
+lazy chunks for its Node-only registry discovery methods (`node:fs`,
+`node:path`); those are never loaded unless you call `Registry.discover()` or
+set `extensionsDir`.
 
 ## Examples
 

@@ -5,7 +5,7 @@ import { pathToFileURL } from 'node:url';
 import { resolve as resolvePath } from 'node:path';
 import { formatModules } from 'apcore-toolkit';
 import type { ScannedModule } from 'apcore-toolkit';
-import { HonoApcore } from './core/apcore.js';
+import { HonoApcore } from './core/apcore.node.js';
 import { HonoRouteScanner } from './scanners/hono-route-scanner.js';
 import type { HonoAppLike } from './scanners/hono-route-scanner.js';
 import { renderBindingsYaml, writeBindingsFile } from './output/yaml-writer.js';
@@ -191,6 +191,11 @@ async function commandServe(entry: string, values: Record<string, unknown>): Pro
   await instance.init(app ?? undefined, routeOptions(values, instance));
 
   if (values['bindings']) {
+    if (typeof instance.loadBindings !== 'function') {
+      throw new Error(
+        '--bindings requires an app built from the Node entry (hono-apcore), not hono-apcore/edge.',
+      );
+    }
     await instance.loadBindings(values['bindings'] as string);
   }
 

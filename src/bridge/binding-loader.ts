@@ -1,6 +1,5 @@
-import { readFile } from 'node:fs/promises';
 import * as yaml from 'js-yaml';
-import { parseBindingDocument } from 'apcore-toolkit';
+import { parseBindingDocument } from 'apcore-toolkit/browser';
 import type { ApcoreRegistry } from '../core/registry.js';
 import {
   EMPTY_OBJECT_SCHEMA,
@@ -100,6 +99,7 @@ export class ApBindingLoader {
    * @returns The module IDs that were registered.
    */
   async loadFromFile(filePath: string): Promise<string[]> {
+    const { readFile } = await import('node:fs/promises');
     return this.loadFromString(await readFile(filePath, 'utf-8'));
   }
 }
