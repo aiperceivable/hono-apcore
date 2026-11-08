@@ -43,8 +43,8 @@ importers:
         specifier: ^0.12.7
         version: 0.12.7(apcore-js@0.32.3)(apcore-toolkit@0.14.1(@sinclair/typebox@0.34.52))
       apcore-mcp:
-        specifier: ^0.23.4
-        version: 0.23.4(@sinclair/typebox@0.34.52)(zod@4.4.3)
+        specifier: ^0.23.5
+        version: 0.23.5(@sinclair/typebox@0.34.52)(zod@4.4.3)
       apdev-js:
         specifier: ^0.2.0
         version: 0.2.4(typescript@5.9.3)
@@ -554,8 +554,8 @@ packages:
     resolution: {integrity: sha512-kmIDULt35c4vv9fxopnUomDi2Vvb9TzX4JdO9xfv6+XAE62OxuH4a6cvIQCuu62A5ESsIiwa2evhNX+PbPyqtA==}
     engines: {node: '>=20.0.0'}
 
-  apcore-mcp@0.23.4:
-    resolution: {integrity: sha512-U6v4vyvj3l5RwjtkSc1s7faiAJjnWLBF3x/Ym7167rPtyat4Kj7af7a6LW+zI6SXcTfLaZ6LuFF7OtnIVcwOhw==}
+  apcore-mcp@0.23.5:
+    resolution: {integrity: sha512-AZIwzoOm1pAKEuk0UbJLyoVA/mgH94DyfJV69l5yBj/Sj67z49QnnabnXJWz5gOCfCYFhbYTA369TzfvYEnuJg==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
@@ -1852,7 +1852,7 @@ snapshots:
       js-yaml: 4.3.1
       uuid: 11.1.1
 
-  apcore-mcp@0.23.4(@sinclair/typebox@0.34.52)(zod@4.4.3):
+  apcore-mcp@0.23.5(@sinclair/typebox@0.34.52)(zod@4.4.3):
     dependencies:
       '@modelcontextprotocol/sdk': 1.30.0(zod@4.4.3)
       ajv: 8.20.0

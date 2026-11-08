@@ -80,6 +80,16 @@ beforeAll(async () => {
         handler: (inputs) => inputs,
       }),
       defineTool({
+        id: 'async.echo',
+        description: 'Delayed echo for the async task bridge',
+        inputSchema: Type.Object({ value: Type.String(), delayMs: Type.Optional(Type.Number()) }),
+        metadata: { async: true },
+        handler: async (inputs) => {
+          await new Promise((resolve) => setTimeout(resolve, Number(inputs.delayMs ?? 10)));
+          return { value: inputs.value };
+        },
+      }),
+      defineTool({
         id: 'privacy.redact', description: 'Return a referenced sensitive value',
         outputSchema: {
           type: 'object',
@@ -90,7 +100,7 @@ beforeAll(async () => {
         handler: () => ({ secret: 'do-not-leak', visible: 'public' }),
       }),
     ],
-    mcp: { name: 'hono-apcore-e2e', version: '1.0.0', logLevel: 'ERROR' },
+    mcp: { name: 'hono-apcore-e2e', version: '1.0.0', logLevel: 'ERROR', async: { enabled: true, maxConcurrent: 2, maxTasks: 4 } },
   });
 
   await ap.init(app);
@@ -127,7 +137,7 @@ afterAll(async () => {
 describe('hono-apcore end to end', () => {
   it('registers both the tools and the scanned routes', () => {
     expect(ap.registry.list().sort()).toEqual([
-      'contract.echo', 'errors.fail', 'math.add', 'privacy.redact', 'todos.get', 'todos.list',
+      'async.echo', 'contract.echo', 'errors.fail', 'math.add', 'privacy.redact', 'todos.get', 'todos.list',
     ]);
   });
 
@@ -151,6 +161,24 @@ describe('hono-apcore end to end', () => {
     const result = await rpc('tools/call', { name: 'math.add', arguments: { a: 2, b: 3 } });
     const content = (result.result as { content: { text: string }[] }).content;
     expect(JSON.parse(content[0].text)).toEqual({ sum: 5 });
+  });
+
+  it('runs async-hinted tools through the task bridge', async () => {
+    const submitted = await rpc('tools/call', { name: 'async.echo', arguments: { value: 'bridge', delayMs: 30 } });
+    const submitContent = (submitted.result as { content: { text: string }[] }).content;
+    const task = JSON.parse(submitContent[0].text) as { task_id: string; status: string };
+    expect(task.status).toBe('pending');
+
+    let status: { status: string; result?: unknown } | undefined;
+    for (let attempt = 0; attempt < 50; attempt++) {
+      const response = await rpc('tools/call', { name: '__apcore_task_status', arguments: { task_id: task.task_id } });
+      const content = (response.result as { content: { text: string }[] }).content;
+      status = JSON.parse(content[0].text) as { status: string; result?: unknown };
+      if (['completed', 'failed', 'cancelled'].includes(status.status)) break;
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
+    expect(status?.status).toBe('completed');
+    expect(status?.result).toEqual({ value: 'bridge' });
   });
 
   it('advertises runtime-faithful MCP input schemas and preserves explicit nulls', async () => {

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.3.1] - 2026-11-08
+
+### Changed
+
+- Raise the optional `apcore-mcp` peer floor to **0.23.5**, the first release
+  whose Async Task Bridge matches `apcore-js` 0.32.3 (options constructor,
+  `{ context }` submit, async `getStatus` / `listTasks`). 0.23.4 could install
+  against 0.32.3 but failed at runtime. No source code changes are required.
+- Add an end-to-end async task bridge test (submit → status) against the
+  published `apcore-mcp` 0.23.5.
+
 ## [0.3.0] - 2026-11-02
 
 ### Added

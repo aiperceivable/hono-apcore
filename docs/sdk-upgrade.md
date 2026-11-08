@@ -9,12 +9,28 @@ unchanged; these changes are recorded under Unreleased.
 | --- | --- | --- |
 | apcore-js | 0.32.2 | 0.32.3 |
 | apcore-toolkit | 0.14.0 | 0.14.1 |
-| apcore-mcp | 0.23.1 | 0.23.4 |
+| apcore-mcp | 0.23.1 | 0.23.5 |
 | apcore-cli | 0.12.5 | 0.12.7 |
 | apcore-a2a | 0.8.3 | 0.8.5 |
 
 All five SDKs require Node.js 20+. The adapter's engine requirement now matches;
 CI already uses Node.js 20. Optional surface packages remain lazily imported.
+
+## MCP 0.23.5 assessment (2026-11-08)
+
+Raise the optional MCP peer floor to 0.23.5. This is the first published
+release whose Async Task Bridge matches `apcore-js` 0.32.3: the manager
+constructor takes an options object, `submit()` receives `{ context }`, and
+`getStatus()` / `listTasks()` are awaited. 0.23.4 declared `apcore-js >=0.32.3`
+but still used the older synchronous/positional contract, so async-hinted
+tools returned empty task projections or failed with
+`Cannot read properties of undefined (reading 'call')`.
+
+No Hono source code changes are required: the adapter only forwards the
+`async` option to `serve()` / `asyncServe()` and lazily loads `apcore-mcp`.
+The root and demo lockfiles now resolve 0.23.5. An end-to-end test submits an
+async-hinted tool through the mounted MCP endpoint and polls
+`__apcore_task_status`; the full test suite and edge bundle check pass.
 
 ## MCP 0.23.4 assessment (2026-11-02)
 
