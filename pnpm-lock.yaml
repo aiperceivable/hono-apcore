@@ -12,8 +12,8 @@ importers:
         specifier: '>=0.32.3'
         version: 0.32.3
       apcore-toolkit:
-        specifier: '>=0.14.1'
-        version: 0.14.1(@sinclair/typebox@0.34.52)
+        specifier: '>=0.14.2'
+        version: 0.14.2(@sinclair/typebox@0.34.52)
       js-yaml:
         specifier: ^4.1.0
         version: 4.3.1
@@ -41,7 +41,7 @@ importers:
         version: 0.8.5(@sinclair/typebox@0.34.52)
       apcore-cli:
         specifier: ^0.12.7
-        version: 0.12.7(apcore-js@0.32.3)(apcore-toolkit@0.14.1(@sinclair/typebox@0.34.52))
+        version: 0.12.7(apcore-js@0.32.3)(apcore-toolkit@0.14.2(@sinclair/typebox@0.34.52))
       apcore-mcp:
         specifier: ^0.23.5
         version: 0.23.5(@sinclair/typebox@0.34.52)(zod@4.4.3)
@@ -559,9 +559,9 @@ packages:
     engines: {node: '>=20.0.0'}
     hasBin: true
 
-  apcore-toolkit@0.14.1:
-    resolution: {integrity: sha512-sB0rkV54b2XYz6o2yQWCUZ9KF2YWR+ETXtn1jDjVIvNxy2WNF/+7BDqQBbxbAwwTLz7+iP8WDJ+26RXz2XWEGA==}
-    engines: {node: '>=20.0.0'}
+  apcore-toolkit@0.14.2:
+    resolution: {integrity: sha512-BQJdq5mVHKMvkDEbocqHkGioj+B+25gicyP1v5Tx2t7qIccyXQsZvALgEUyt40/aXZDJz6+cYtvYAo1r8SotFw==}
+    engines: {node: '>=20.10.0'}
     peerDependencies:
       '@sinclair/typebox': '>=0.31.0'
 
@@ -1822,7 +1822,7 @@ snapshots:
     dependencies:
       '@a2a-js/sdk': 1.3.0(express@5.3.0)
       apcore-js: 0.32.3
-      apcore-toolkit: 0.14.1(@sinclair/typebox@0.34.52)
+      apcore-toolkit: 0.14.2(@sinclair/typebox@0.34.52)
       express: 5.3.0
       jsonwebtoken: 9.0.3
       uuid: 13.0.2
@@ -1836,11 +1836,11 @@ snapshots:
       - pg
       - supports-color
 
-  apcore-cli@0.12.7(apcore-js@0.32.3)(apcore-toolkit@0.14.1(@sinclair/typebox@0.34.52)):
+  apcore-cli@0.12.7(apcore-js@0.32.3)(apcore-toolkit@0.14.2(@sinclair/typebox@0.34.52)):
     dependencies:
       '@sinclair/typebox': 0.34.52
       apcore-js: 0.32.3
-      apcore-toolkit: 0.14.1(@sinclair/typebox@0.34.52)
+      apcore-toolkit: 0.14.2(@sinclair/typebox@0.34.52)
       commander: 12.1.0
       js-yaml: 4.3.1
     optionalDependencies:
@@ -1857,7 +1857,7 @@ snapshots:
       '@modelcontextprotocol/sdk': 1.30.0(zod@4.4.3)
       ajv: 8.20.0
       apcore-js: 0.32.3
-      apcore-toolkit: 0.14.1(@sinclair/typebox@0.34.52)
+      apcore-toolkit: 0.14.2(@sinclair/typebox@0.34.52)
       jsonwebtoken: 9.0.3
       mcp-embedded-ui: 0.5.0
     transitivePeerDependencies:
@@ -1866,7 +1866,7 @@ snapshots:
       - supports-color
       - zod
 
-  apcore-toolkit@0.14.1(@sinclair/typebox@0.34.52):
+  apcore-toolkit@0.14.2(@sinclair/typebox@0.34.52):
     dependencies:
       '@sinclair/typebox': 0.34.52
       ajv: 8.20.0
