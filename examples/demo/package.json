@@ -11,15 +11,15 @@
     "export": "tsx ../../src/cli.ts export ./src/app.ts"
   },
   "dependencies": {
-    "@hono/node-server": "^2.1.1",
+    "@hono/node-server": "^2.1.8",
     "@sinclair/typebox": "^0.34.52",
     "apcore-js": "^0.32.3",
-    "apcore-mcp": "^0.23.4",
-    "hono": "^4.13.4",
+    "apcore-mcp": "^0.23.6",
+    "hono": "^4.13.18",
     "hono-apcore": "file:../.."
   },
   "devDependencies": {
-    "tsx": "^4.20.0",
-    "typescript": "^5.9.0"
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
   }
 }

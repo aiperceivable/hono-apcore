@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+## [0.3.4] - 2026-11-20
+
+### Security
+
+- Upgrade `@modelcontextprotocol/sdk` to `^1.32.0` and the runtime dependency
+  `js-yaml` to `^4.3.2`.
+
+### Changed
+
+- Refresh the development toolchain: `hono` 4.13.19, `@hono/node-server` 2.1.9,
+  `zod` 4.6.6 and `vitest` / `@vitest/coverage-v8` 5.1.0.
+
 ## [0.3.2] - 2026-11-09
 
 ### Changed
